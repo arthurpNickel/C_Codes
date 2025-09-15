@@ -16,7 +16,7 @@ int n;
 
 /* coloque aqui as funções auxiliares que precisar neste arquivo */
 
-int le_vetor(struct racional V[], int n);
+int le_v(struct racional V[], int n);
 {
 	int i;
 	for (i = 0; i < n; i++)
@@ -24,7 +24,7 @@ int le_vetor(struct racional V[], int n);
 	return 1;
 }
 
-int imprime_vetor(struct racional V[], int n);
+int imprime_v(struct racional V[], int n);
 {
 	int i;
 	printf("VETOR = ");
@@ -37,10 +37,20 @@ int imprime_vetor(struct racional V[], int n);
 	return 1;
 }
 
-//select sort
-int ordena_vetor(struct racional V[], int N)
+//aqui ou no TADS?
+void troca_r(struct racional *a, struct racional *b)
 {
-	int pos_menor, aux;
+	struct racional aux = *a;
+	*a = *b;
+	*b = aux;
+	return;
+}
+
+//select sort
+int ordena_v(struct racional V[], int N)
+{
+	int pos_menor;
+	struct racional aux;
 	
 	//define posição da vez que será ordenada
 	for (i = 0; i <= N; i++)
@@ -50,11 +60,9 @@ int ordena_vetor(struct racional V[], int N)
 		for (j = i + 1; j <= N, j++)
 			if (compara_r(V[j], V[pos_menor]) == -1) //se V[j] for menor que menor...
 				pos_menor = j;
-				
-		//troca menor com posição da vez -> função própria?
-		aux = V[i];
-		V[i] = V[pos_menor];
-		V[pos_menor] = aux;
+		
+		//função de troca entre rótulos	
+		troca_r(&V[i], &V[pos_menor]);
 	}
 }
 
@@ -67,12 +75,26 @@ int main ()
 	if (!( (n > 0) || (n < 100) )
 		return 0;
 	
-	le_vetor(V, n);
-	imprime_vetor(V, n);
+	le_v(V, n);
+	imprime_v(V, n);
 	
 	//eliminar elementos inválidos - ou mover todos os válidos um para trás
 	int invalidos = 0;
 	int i, j, novo_tam;
+	
+	i = n-1;
+	while (i >= 0)
+	{
+		if (!valido_r(V[i]))
+		{
+		       //tirar elemento invalido do vetor, movendo todos os elementos da frente uma posição à esquerda
+			for (j = i; j < ((n-1)-invalidos); j++) //tá certa a condição?
+				V[j] = J[j+1]; //assim é o melhor jeito?
+			
+			invalidos++;
+		}
+		i--;
+	}
 	
 	//isso daqui não vai dar certo -> não considerei que vetor vai diminuindo
 	for (i = 0; i < n; i++) //será que não é melhor de trás para frente?
@@ -82,13 +104,14 @@ int main ()
 				V[j] = J[j+1]; //assim é o melhor jeito?
 			invalidos++;
 		}
+	
 	novo_tam = n-invalidos;
 	
-	imprime_vetor(V, n);
+	imprime_v(V, n);
 	
-	ordena_vetor(V, novo_tam);
+	ordena_v(V, novo_tam);
 	
-	imprime_vetor(V, n);
+	imprime_v(V, n);
 	
 	//somar elementos do vetor
 	struct racional soma = V[0];
