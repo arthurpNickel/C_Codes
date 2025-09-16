@@ -6,25 +6,21 @@
 
 /* coloque aqui seus includes (primeiro os <...>, depois os "...") */
 #include <stdio.h>
-
-struct racional {
-	long num;
-	long den;
-};
+#include "racional.h"
 
 int n;
 
 /* coloque aqui as funções auxiliares que precisar neste arquivo */
 
-int le_v(struct racional V[], int n);
+int le_v(struct racional V[], int n)
 {
 	int i;
 	for (i = 0; i < n; i++)
-		scanf("%ld %ld", V[i].num, V[i].den); //ta certo?
+		scanf("%ld" "%ld", &V[i].num, &V[i].den); //ta certo?
 	return 1;
 }
 
-int imprime_v(struct racional V[], int n);
+int imprime_v(struct racional V[], int n)
 {
 	int i;
 	printf("VETOR = ");
@@ -49,21 +45,22 @@ void troca_r(struct racional *a, struct racional *b)
 //select sort
 int ordena_v(struct racional V[], int N)
 {
-	int pos_menor;
-	struct racional aux;
+	int pos_menor, i, j;
 	
 	//define posição da vez que será ordenada
 	for (i = 0; i <= N; i++)
 	{
 		//procura posição do menor elemento não ordenado no vetor
 		pos_menor = i;
-		for (j = i + 1; j <= N, j++)
+		for (j = i + 1; j <= N; j++)
 			if (compara_r(V[j], V[pos_menor]) == -1) //se V[j] for menor que menor...
 				pos_menor = j;
 		
 		//função de troca entre rótulos	
 		troca_r(&V[i], &V[pos_menor]);
 	}
+	
+	return 0;
 }
 
 /* programa principal */
@@ -71,8 +68,8 @@ int main ()
 {
 	struct racional V[100];
 	
-	scanf("%d", n);
-	if (!( (n > 0) || (n < 100) )
+	scanf("%d", &n);
+	if (!( (n > 0) || (n < 100) ))
 		return 0;
 	
 	le_v(V, n);
@@ -89,21 +86,12 @@ int main ()
 		{
 		       //tirar elemento invalido do vetor, movendo todos os elementos da frente uma posição à esquerda
 			for (j = i; j < ((n-1)-invalidos); j++) //tá certa a condição?
-				V[j] = J[j+1]; //assim é o melhor jeito?
+				V[j] = V[j+1]; //assim é o melhor jeito?
 			
 			invalidos++;
 		}
 		i--;
 	}
-	
-	//isso daqui não vai dar certo -> não considerei que vetor vai diminuindo
-	for (i = 0; i < n; i++) //será que não é melhor de trás para frente?
-		if (!valido_r(V[i]))
-		{
-			for (j = i; j < (n-invalidos); j++) //tá certa a condição?
-				V[j] = J[j+1]; //assim é o melhor jeito?
-			invalidos++;
-		}
 	
 	novo_tam = n-invalidos;
 	
@@ -125,3 +113,13 @@ int main ()
 
 	return 0;
 }
+
+/*isso daqui não vai dar certo -> não considerei que vetor vai diminuindo
+	for (i = 0; i < n; i++) //será que não é melhor de trás para frente?
+		if (!valido_r(V[i]))
+		{
+			for (j = i; j < (n-invalidos); j++) //tá certa a condição?
+				V[j] = J[j+1]; //assim é o melhor jeito?
+			invalidos++;
+		}
+	*/
