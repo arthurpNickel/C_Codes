@@ -79,7 +79,6 @@ int main ()
 	int invalidos = 0;
 	int i, j, novo_tam;
 	
-	i = n-1;
 	while (i >= 0)
 	{
 		if (!valido_r(V[i]))
@@ -95,11 +94,11 @@ int main ()
 	
 	novo_tam = n-invalidos;
 	
-	imprime_v(V, n);
+	imprime_v(V, novo_tam);
 	
 	ordena_v(V, novo_tam);
 	
-	imprime_v(V, n);
+	imprime_v(V, novo_tam);
 	
 	//somar elementos do vetor
 	struct racional soma = V[0];
@@ -122,4 +121,20 @@ int main ()
 				V[j] = J[j+1]; //assim é o melhor jeito?
 			invalidos++;
 		}
+		
+Outra forma:
+
+while (i >= 0)
+	{
+		if (!valido_r(V[i]))
+		{
+		       //tirar elemento invalido do vetor, movendo todos os elementos da frente uma posição à esquerda
+			for (j = i; j < ((n-1)-invalidos); j++) //tá certa a condição?
+				V[j] = V[j+1]; //assim é o melhor jeito?
+			
+			invalidos++;
+		}
+		i--;
+	}
+			
 	*/

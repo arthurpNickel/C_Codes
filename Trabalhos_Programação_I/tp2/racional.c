@@ -21,10 +21,6 @@
 
 
 /* estrutura que representa um número racional */
-struct racional {
-  long num;          /* numerador   */
-  long den;          /* denominador */
-};
 
 /* retorna um número aleatório entre min e max, inclusive. */
 long aleat (long min, long max)
@@ -130,7 +126,7 @@ struct racional sorteia_r (long min, long max)
      - se numerador e denominador forem negativos, o racional é positivo. */
 void imprime_r (struct racional r)
 {
-	simplifica_r(r);
+	r = simplifica_r(r);
         if (!valido_r(r))
         {
               printf("NaN");
