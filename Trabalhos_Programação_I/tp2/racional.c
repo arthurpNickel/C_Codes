@@ -148,19 +148,24 @@ void imprime_r (struct racional r)
 
 /* Compara dois racionais r1 e r2. Retorno: -2 se r1 ou r2 for inválido,
  * -1 se r1 < r2, 0 se r1 = r2 ou 1 se r1 > r2 */
-int compara_r(struct racional r1, struct racional r2) {
-    if (!(valido_r(r1) && valido_r(r2)))
-        return -2;
+int compara_r(struct racional r1, struct racional r2) 
+{
+	if (!(valido_r(r1) && valido_r(r2)))
+		return -2;
 
-    r1 = simplifica_r(r1);
-    r2 = simplifica_r(r2);
+	r1 = simplifica_r(r1); //!!!!
+	r2 = simplifica_r(r2);
+	       
+	long n1 = r1.num * r2.den;
+	long n2 = r2.num * r1.den;
 
-    long n1 = r1.num * r2.den;
-    long n2 = r2.num * r1.den;
-
-    if (n1 < n2) return -1;
-    if (n1 > n2) return 1;
-    return 0;
+	if (n1 < n2) 
+		return -1;
+		
+	if (n1 > n2) 
+		return 1;
+		
+	return 0;
 }
 
 
@@ -170,10 +175,12 @@ int compara_r(struct racional r1, struct racional r2) {
  *         0 se r1 ou r2 for inválido ou se *r3 for nulo */
 int soma_r (struct racional r1, struct racional r2, struct racional *r3)
 {	
+	if (!(valido_r(r1) && valido_r(r2))) //Parênteses?
+		return 0;
 	r3->den = r1.den*r2.den;
 	r3->num = r1.num*r2.den + r2.num*r1.den;
 	*r3 = simplifica_r(*r3);
-	if (!(valido_r(r1) && valido_r(r2)) || r3->num == 0) //Parênteses?
+	if (r3->num == 0) //Parênteses?
 		return 0;
 	return 1;
 }

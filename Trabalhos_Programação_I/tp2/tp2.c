@@ -16,7 +16,7 @@ int le_v(struct racional V[], int n)
 {
 	int i;
 	for (i = 0; i < n; i++)
-		scanf("%ld" "%ld", &V[i].num, &V[i].den); //ta certo?
+		scanf("%ld %ld", &V[i].num, &V[i].den); //ta certo?
 	return 1;
 }
 
@@ -43,16 +43,16 @@ void troca_r(struct racional *a, struct racional *b)
 }
 
 //select sort
-int ordena_v(struct racional V[], int N)
+int ordena_v(struct racional V[], int tam)
 {
 	int pos_menor, i, j;
 	
 	//define posição da vez que será ordenada
-	for (i = 0; i < N - 1; i++)
+	for (i = 0; i < tam - 1; i++)
 	{
 		//procura posição do menor elemento não ordenado no vetor
 		pos_menor = i;
-		for (j = i + 1; j < N; j++)
+		for (j = i + 1; j < tam; j++)
 			if (compara_r(V[j], V[pos_menor]) == -1) //se V[j] for menor que menor...
 				pos_menor = j;
 		
@@ -62,6 +62,48 @@ int ordena_v(struct racional V[], int N)
 	
 	return 0;
 }
+
+//eliminar elementos inválidos
+void elimina_v(struct racional V[], int tam)
+{
+	int i = 0;
+	int j = tam - 1;
+
+	while (i <= j) 
+	{
+		if (valido_r(V[i]))
+        		i++; 
+    		else if (!valido_r(V[j]))
+        		j--;
+    		else
+    		{
+        		troca_r(&V[i], &V[j]);
+        		i++;
+        		j--;
+    		}
+	}
+	return; //!!!
+}
+
+struct racional soma_v(struct racional V[], int tam)
+{
+	int i;
+	struct racional vsoma;
+	
+	if (tam == 0)
+	{
+		vsoma.num = 0;
+		vsoma.den = 1;
+	}
+	else
+	{	
+		vsoma = V[0];
+		for (i = 1; i < tam; i++)
+			soma_r(vsoma, V[i], &vsoma);
+	}
+	return vsoma;
+}
+
 
 /* programa principal */
 int main ()
@@ -75,24 +117,11 @@ int main ()
 	le_v(V, n);
 	imprime_v(V, n);
 	
-	//eliminar elementos inválidos
-	int a = 0;
-int b = n - 1;
+	elimina_v(V, n);
 
-while (a <= b) {
-    if (valido_r(V[a])) {
-        a++;
-    } else if (!valido_r(V[b])) {
-        b--;
-    } else {
-        troca_r(&V[a], &V[b]);
-        a++;
-        b--;
-    }
-}
-
-int novo_tam = a; // todos os válidos ficaram antes de 'a'
-
+	/*conta elementos válidos*/
+	int novo_tam = 0;
+	while (valido_r(V[novo_tam])) novo_tam++;
 	
 	imprime_v(V, novo_tam);
 	
@@ -100,12 +129,7 @@ int novo_tam = a; // todos os válidos ficaram antes de 'a'
 	
 	imprime_v(V, novo_tam);
 	
-	//somar elementos do vetor
-	int ind;
-	struct racional soma = V[0];
-	for (ind = 1; ind < novo_tam; ind++)
-		soma_r(soma, V[ind], &soma);
-
+	struct racional soma = soma_v(V, novo_tam);
 	
 	printf("SOMA = ");
 	imprime_r(soma);
