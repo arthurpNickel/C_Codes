@@ -48,11 +48,11 @@ int ordena_v(struct racional V[], int N)
 	int pos_menor, i, j;
 	
 	//define posição da vez que será ordenada
-	for (i = 0; i <= N; i++)
+	for (i = 0; i < N - 1; i++)
 	{
 		//procura posição do menor elemento não ordenado no vetor
 		pos_menor = i;
-		for (j = i + 1; j <= N; j++)
+		for (j = i + 1; j < N; j++)
 			if (compara_r(V[j], V[pos_menor]) == -1) //se V[j] for menor que menor...
 				pos_menor = j;
 		
@@ -69,30 +69,30 @@ int main ()
 	struct racional V[100];
 	
 	scanf("%d", &n);
-	if (!( (n > 0) || (n < 100) ))
+	if (!( (n > 0) && (n < 100) ))
 		return 0;
 	
 	le_v(V, n);
 	imprime_v(V, n);
 	
-	//eliminar elementos inválidos - ou mover todos os válidos um para trás
-	int invalidos = 0;
-	int i, j, novo_tam;
-	
-	while (i >= 0)
-	{
-		if (!valido_r(V[i]))
-		{
-		       //tirar elemento invalido do vetor, movendo todos os elementos da frente uma posição à esquerda
-			for (j = i; j < ((n-1)-invalidos); j++) //tá certa a condição?
-				V[j] = V[j+1]; //assim é o melhor jeito?
-			
-			invalidos++;
-		}
-		i--;
-	}
-	
-	novo_tam = n-invalidos;
+	//eliminar elementos inválidos
+	int a = 0;
+int b = n - 1;
+
+while (a <= b) {
+    if (valido_r(V[a])) {
+        a++;
+    } else if (!valido_r(V[b])) {
+        b--;
+    } else {
+        troca_r(&V[a], &V[b]);
+        a++;
+        b--;
+    }
+}
+
+int novo_tam = a; // todos os válidos ficaram antes de 'a'
+
 	
 	imprime_v(V, novo_tam);
 	
@@ -101,9 +101,10 @@ int main ()
 	imprime_v(V, novo_tam);
 	
 	//somar elementos do vetor
+	int ind;
 	struct racional soma = V[0];
-	for (i = 1; i <= novo_tam; i++)
-		soma_r(soma, V[i], &soma);
+	for (ind = 1; ind < novo_tam; ind++)
+		soma_r(soma, V[ind], &soma);
 
 	
 	printf("SOMA = ");
@@ -136,5 +137,58 @@ while (i >= 0)
 		}
 		i--;
 	}
+	
+Outra:
+	int j = 0;
+	int i;
+	for (i = 0; i < n; i++)
+		if (valido_r(V[i]))
+		{
+			V[j] = V[i];
+			j++;
+		}
+		
+E outra:
+
+	//eliminar elementos inválidos
+	int b = n - 1;
+	int a = 0;
+	int invalidos = 0;
+	while (a < b)
+	{
+		while (valido_r(V[a]))
+			a++;
+		while (!valido_r(V[b]))
+			b--;
+		if (a < b)
+		{
+			troca_r(&V[a], &V[b]); //precisa dos &?
+			a++;
+			b--;
+			invalidos++;
+		}
+	}
+	
+	int novo_tam = n - invalidos;
 			
 	*/
+/*
+/* Compara dois racionais r1 e r2. Retorno: -2 se r1 ou r2 for inválido,
+ * -1 se r1 < r2, 0 se r1 = r2 ou 1 se r1 > r2 
+int compara_r (struct racional r1, struct racional r2)
+{
+        if (!(valido_r(r1) && valido_r(r2)))
+                return -2;
+                
+        long vmmc = mmc(r1.den, r2.den);
+        
+        
+        if ( r1.num*vmmc < r2.num*vmmc )
+        	return -1;
+        	
+        if ( r1.num*vmmc == r2.num*vmmc )
+        	return 0;
+
+        return 1;
+}
+*/
