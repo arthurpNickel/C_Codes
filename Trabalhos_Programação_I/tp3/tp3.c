@@ -7,6 +7,7 @@
 /* coloque aqui seus includes (primeiro os <...>, depois os "...") */
 #include <stdio.h>
 #include <stdlib.h>
+#include "racional.h"
 
 /* coloque aqui as funções auxiliares que precisar neste arquivo */
 
@@ -32,14 +33,16 @@ int main ()
 	
 	if ((n < 0) || (n > 100))
 		return 1;
-	int *v;
-	if (!(v = malloc(sizeof(struct racional)*n*1024))) //1024??
+	
+	struct racional *v[n];
+	if (!(v = malloc(sizeof(struct racional*)*n))) //1024??
 		return 1;
+	
 	int i;
 	long num, den;
 	for (i = 0; i < n; i++)
 	{
-		scanf("%ld %ld", num, den);
+		scanf("%ld %ld", &num, &den);
 		v[i] = cria_r(num, den);
 	}
 	
