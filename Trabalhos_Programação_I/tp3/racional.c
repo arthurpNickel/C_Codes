@@ -59,32 +59,37 @@ int simplifica_r (struct racional *r)
 /* implemente as demais funções de racional.h aqui */
 
 /* Retorna o numerador do racional r */
-long numerador_r (struct racional r);
+long numerador_r (struct racional r)
 {
         return r.num;
 }
 
 /* Retorna o denominador do racional r */
-long denominador_r (struct racional r);
+long denominador_r (struct racional r)
 {
         return r.den;
 }
 
+/*aloca o espaço do racional e coloca o num e den no lugar que eles apontam*/
 /* Cria um número racional com o numerador e denominador indicados
  * e retorna um ponteiro que aponta para ele.
  * A memória para o número racional deve ser alocada dinamicamente
  * por esta função. Retorna NULL se não conseguiu alocar a memória. */
 struct racional *cria_r (long numerador, long denominador)
 {
-	struct racional r;
+	/*cria ponteiro*/
+	struct racional *r;
 	
-	if (!(r = malloc(sizeof(struct racional))))
+	/*aloca um espaço de uma struct na memória e retorna
+	o endereço para o ponteiro*/
+	if (!(r = malloc(sizeof(struct racional*))))
 		return NULL;
 	
-	r.num = numerador;
-	r.den = denominador;
+	/*atribui num e den nos espaços reservados pelo malloc*/
+	r->num = numerador;
+	r->den = denominador;
 	
-	return &r;
+	return r;
 }
 /* Libera a memória alocada para o racional apontado por r */
 void destroi_r (struct racional **r);
@@ -104,7 +109,12 @@ int valido_r (struct racional *r);
      - se o numerador e denominador forem iguais, imprime somente "1";
      - se o racional for negativo, o sinal é impresso antes do número;
      - se numerador e denominador forem negativos, o racional é positivo. */
-void imprime_r (struct racional *r);
+void imprime_r (struct racional *r)
+{	
+        printf("%ld/%ld", r->num, r->den);
+        return;
+}
+
 
 /* Compara dois números racionais r1 e r2.
  * Retorna -2 se r1 ou r2 for inválido ou se o respectivo ponteiro for nulo.

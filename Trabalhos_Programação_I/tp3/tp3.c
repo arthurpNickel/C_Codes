@@ -28,16 +28,21 @@ void imprime_v(struct racional *v[], int tam)
 /* programa principal */
 int main ()
 {
+	/*lê tamanho e testa se é válido*/
 	int n;
 	scanf("%d", &n);
 	
 	if ((n < 0) || (n > 100))
 		return 1;
 	
-	struct racional *v[n];
-	if (!(v = malloc(sizeof(struct racional*)*n))) //1024??
+	/*cria ponteiro para o primeiro elemento do vetor (um ponteiro)*/
+	struct racional **v;
+	
+	/*aloca n espaços para o ponteiro para ponteiro v e testa*/
+	if (!(v = malloc(sizeof(struct racional*)*n)))
 		return 1;
 	
+	/*cada ponteiro do vetor de structs recebe um endereço para apontar, com uma certa struct*/
 	int i;
 	long num, den;
 	for (i = 0; i < n; i++)
@@ -47,6 +52,8 @@ int main ()
 	}
 	
 	imprime_v(v, n);
+	
+	//CONSERTAR IMPRIME_R!!!!!!!
 	
 	return 0;
 }
