@@ -2,13 +2,13 @@
 
 int BuscaBinaria(int procurado, int esq, int dir, int v[])
 {
+	if (esq > dir)
+		return -1;
+	
 	int meio = (esq + dir) / 2;
 	
 	if (v[meio] == procurado)
 		return meio;
-		
-	if (esq > dir)
-		return -1;
 		
 	if (v[meio] > procurado)
 		return BuscaBinaria(procurado, esq, meio-1, v);
@@ -25,7 +25,7 @@ int main ()
 	int v[tam];
 	
 	int i;
-	printf("entre com os elementos do vetor: ");
+	printf("entre com os elementos do vetor (de forma ordenada): ");
 	for (i = 0; i < tam; i++)
 		scanf("%d", &v[i]);
 	

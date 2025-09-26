@@ -46,6 +46,17 @@ long mmc (long a, long b)
 	return (a * b / mdc(a, b));
 }
 
+
+/* Retorna 1 se o racional r for válido ou 0 se for inválido. Um racional
+ * é inválido se o denominador for zero ou se ele não tiver sido alocado. */
+int valido_r (struct racional *r)
+{
+	if ((r->den == 0) || (r == NULL)) //não sei se segunda condição está certa
+		return 0;	
+		
+	return 1;
+}
+
 /* Simplifica o número racional indicado no parâmetro.
  * Por exemplo, se o número for 10/8 muda para 5/4.
  * Retorna 1 em sucesso e 0 se r for inválido ou o ponteiro for nulo.
@@ -53,7 +64,24 @@ long mmc (long a, long b)
  * Se o denominador for negativo, o sinal deve migrar para o numerador. */
 int simplifica_r (struct racional *r)
 {
-  /* implemente aqui */
+	/*testa número inválido ou ponteiro nulo*/
+        if (!valido_r(r) || r == NULL ) //não sei se é assim que identifica ponteiro nulo
+        	return 0;
+        
+        /*simplifica a fração*/
+        long vmdc;
+	vmdc = mdc(r->num, r->den);
+	r->num = r->num/vmdc;
+	r->den = r->den/vmdc;
+	
+	/*muda sinal, se negativo for numerador ou se os dois forem negativos*/
+	if (((r->num < 0) && (r->den < 0)) || ((r->num > 0) && (r->den < 0)))
+	{
+		r->num = -r->num;
+		r->den = -r->den;
+	}
+	
+	return 1;
 }
 
 /* implemente as demais funções de racional.h aqui */
@@ -92,11 +120,8 @@ struct racional *cria_r (long numerador, long denominador)
 	return r;
 }
 /* Libera a memória alocada para o racional apontado por r */
+//????
 void destroi_r (struct racional **r);
-
-/* Retorna 1 se o racional r for válido ou 0 se for inválido. Um racional
- * é inválido se o denominador for zero ou se ele não tiver sido alocado. */
-int valido_r (struct racional *r);
 
 /* Imprime um racional r, respeitando estas regras:
    - o racional deve estar na forma simplificada;
@@ -109,9 +134,36 @@ int valido_r (struct racional *r);
      - se o numerador e denominador forem iguais, imprime somente "1";
      - se o racional for negativo, o sinal é impresso antes do número;
      - se numerador e denominador forem negativos, o racional é positivo. */
-void imprime_r (struct racional *r)
-{	
+void imprime_r (struct racional *r) /*recebe um ponteiro para um racional*/
+{
+	simplifica_r(r); //será que aqui mesmo???
+	
+	if (r == NULL)
+	{
+		printf("NULL");
+		return;
+	}
+	
+        if (!valido_r(r))
+        {
+              printf("NaN");
+              return;
+        }
+        
+        if (r->num == 0)
+        {
+              printf("%d", 0);
+              return;
+        }
+        
+        if (r->den == 1)
+        {
+              printf("%ld", r->num);
+	      return;
+        }
+        
         printf("%ld/%ld", r->num, r->den);
+        
         return;
 }
 

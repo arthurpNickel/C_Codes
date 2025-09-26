@@ -35,7 +35,7 @@ int main ()
 	if ((n < 0) || (n > 100))
 		return 1;
 	
-	/*cria ponteiro para o primeiro elemento do vetor (um ponteiro)*/
+	/*cria ponteiro para o primeiro elemento do vetor (que é um ponteiro)*/
 	struct racional **v;
 	
 	/*aloca n espaços para o ponteiro para ponteiro v e testa*/
