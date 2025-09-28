@@ -25,6 +25,35 @@ void imprime_v(struct racional *v[], int tam)
 	printf("\n");
 }
 
+/*troca endereços entre dois ponteiros de racionais*/
+void troca_r(struct racional *a, struct racional *b)
+{
+	struct racional aux = a;
+	a = b;
+	b = aux;
+}
+
+/*elimina elementos inválidos do vetor, colocando todos os inválidos à direita*/
+void elimina_v(struct racional v[], int tam)
+{
+	int i = 0;
+	int j = tam - 1;
+	
+	while (i <= j) 
+	{
+		if (valido_r(v[i]))
+        		i++; 
+    		else if (!valido_r(v[j]))
+        		j--;
+    		else
+    		{
+        		troca_r(&v[i], &v[j]);
+        		i++;
+        		j--;
+    		}
+	}
+}
+
 /* programa principal */
 int main ()
 {
@@ -53,7 +82,31 @@ int main ()
 	
 	imprime_v(v, n);
 	
-	//CONSERTAR IMPRIME_R!!!!!!!
+	elimina_v(???, n);
+	
+	/*fazer aqui o elimina, antes de modular*/
+	int i = 0;
+	int j = tam - 1;
+	
+	while (i <= j) 
+	{
+		if (valido_r(v[i]))
+        		i++;
+    		else if (!valido_r(v[j]))
+        		j--;
+    		else
+    		{
+        		/*troca de endereços*/
+        		struct racional aux = v[i];
+			v[i] = v[j];
+			v[j] = aux;
+			
+        		i++;
+        		j--;
+    		}
+	}
+	
+	//MODULAR ISSO!!!!
 	
 	return 0;
 }
