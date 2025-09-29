@@ -26,15 +26,19 @@ void imprime_v(struct racional *v[], int tam)
 }
 
 /*troca endereços entre dois ponteiros de racionais*/
-void troca_r(struct racional *a, struct racional *b)
+void troca_r(struct racional **a, struct racional **b)
+/* a = endereço do rótulo do vetor
+  *a = ponteiro que aponta para conteúdo do rótulo do vetor (endereço do racional
+  **a = ponteiro de ponteiro, que aponta para o racional em si que se quer guardar*/
 {
-	struct racional aux = a;
-	a = b;
-	b = aux;
+	struct racional *aux;
+	*aux = *a;
+	*a = *b;
+	*b = *aux;
 }
 
 /*elimina elementos inválidos do vetor, colocando todos os inválidos à direita*/
-void elimina_v(struct racional v[], int tam)
+void elimina_v(struct racional *v[], int tam)
 {
 	int i = 0;
 	int j = tam - 1;
@@ -82,32 +86,14 @@ int main ()
 	
 	imprime_v(v, n);
 	
-	elimina_v(???, n);
+	elimina_v(v, n);
 	
-	/*fazer aqui o elimina, antes de modular*/
-	int i = 0;
-	int j = tam - 1;
+	/*conta elementos válidos*/
+	int novo_tam = 0;
+	while (valido_r(v[novo_tam])) novo_tam++;
 	
-	while (i <= j) 
-	{
-		if (valido_r(v[i]))
-        		i++;
-    		else if (!valido_r(v[j]))
-        		j--;
-    		else
-    		{
-        		/*troca de endereços*/
-        		struct racional aux = v[i];
-			v[i] = v[j];
-			v[j] = aux;
-			
-        		i++;
-        		j--;
-    		}
-	}
-	
-	//MODULAR ISSO!!!!
-	
+	imprime_v(v, novo_tam);
+
 	return 0;
 }
 
