@@ -25,16 +25,17 @@ void imprime_v(struct racional *v[], int tam)
 	printf("\n");
 }
 
+/*Entender porque isso dá certo*/
+
 /*troca endereços entre dois ponteiros de racionais*/
 void troca_r(struct racional **a, struct racional **b)
 /* a = endereço do rótulo do vetor
   *a = ponteiro que aponta para conteúdo do rótulo do vetor (endereço do racional
   **a = ponteiro de ponteiro, que aponta para o racional em si que se quer guardar*/
 {
-	struct racional *aux;
-	*aux = *a;
+	struct racional *aux = *a;
 	*a = *b;
-	*b = *aux;
+	*b = aux;
 }
 
 /*elimina elementos inválidos do vetor, colocando todos os inválidos à direita*/
@@ -55,6 +56,33 @@ void elimina_v(struct racional *v[], int tam)
         		i++;
         		j--;
     		}
+	}
+}
+
+void particiona_v(*v[], )
+{
+	int i = esq;
+	int j = dir;
+	int aux;
+	
+	while (i < j)
+	{
+		while ()
+	}
+}
+
+/*QuickSort implementado recursivamente, ordenando de forma crescente*/
+void ordena_v(struct racional *v[], esq, dir)
+{
+	int pos_pivo;		
+	
+	if (esq < dir)
+	{
+		particiona_v();
+		
+		ordena_v(v, esq, pos_pivo-1);
+		
+		ordena_v(v, pos_pivo+1, dir);
 	}
 }
 
@@ -93,7 +121,24 @@ int main ()
 	while (valido_r(v[novo_tam])) novo_tam++;
 	
 	imprime_v(v, novo_tam);
+	
+	ordena_v(v, novo_tam);
+	
+	imprime_v(v, 0, tam-1);
+	
+	//Fazer o compara!!!!
 
 	return 0;
 }
+
+/*Porque isso deu errado??
+
+void troca_r(struct racional **a, struct racional **b)
+{
+    struct racional *aux;
+    *aux = *a;
+    *a = *b;
+    *b = *aux;
+}
+*/
 

@@ -22,3 +22,6 @@ void bubble_sort(int v[], int tam)
 	}
 	return;
 }
+
+/*Seria melhor ir de 1 até tam -> v[0] para sentinela
+ *Poderia ter usado 2 for*/

@@ -174,7 +174,10 @@ void imprime_r (struct racional *r) /*recebe um ponteiro para um racional*/
  * Atenção: faça a comparação normalizando os denominadores pelo MMC.
  * Fazer a comparação baseado na divisão do numerador pelo denominador
  * pode gerar erro de arredondamento e falsear o resultado. */
-int compara_r (struct racional *r1, struct racional *r2);
+int compara_r (struct racional *r1, struct racional *r2)
+{
+	
+}
 
 /* Coloca em *r3 a soma simplificada dos racionais *r1 e *r2.
  * Retorna 1 em sucesso e 0 se r1 ou r2 for inválido ou um ponteiro for nulo. */
