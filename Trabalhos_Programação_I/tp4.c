@@ -41,7 +41,6 @@ void teste_lista_vazia (struct lista *l)
         printf ("lista nao esta vazia");
 }
 
-
 void teste_insere_inicio (struct lista *l, int limite)
 {
     int i;
@@ -56,7 +55,6 @@ void teste_insere_inicio (struct lista *l, int limite)
     }
 }
 
-/*
 void teste_insere_fim (struct lista *l, int limite)
 {
     int i;
@@ -71,23 +69,21 @@ void teste_insere_fim (struct lista *l, int limite)
     }
 }
 
-
 void teste_remove_inicio (struct lista *l)
 {
     int chave;
 
-    / remove todo mundo /
+    /* remove todo mundo */
     while (! lista_vazia (l))
         if (lista_remove_inicio (l, &chave))
             imprimir_lista (l);
 }
 
-
 void teste_remove_fim (struct lista *l)
 {
     int chave;
 
-    / remove todo mundo /
+    /* remove todo mundo */
     while (! lista_vazia (l))
         if (lista_remove_fim (l, &chave))
             imprimir_lista (l);
@@ -119,7 +115,7 @@ void teste_de_pertinencia (struct lista *l)
     lista_insere_inicio (l, 11);
     lista_insere_inicio (l, 12);
     lista_insere_inicio (l, 14);
-    /imprimir_lista (l);/
+    /*imprimir_lista (l);*/
     imprimir_lista (l);
     if (lista_pertence (l, 11)) printf ("11 pertence\n");
     if (lista_pertence (l, 12)) printf ("12 pertence\n");
@@ -129,7 +125,6 @@ void teste_de_pertinencia (struct lista *l)
     if (! lista_pertence (l, 10)) printf ("10 nao pertence\n");
     if (! lista_pertence (l, 16)) printf ("16 nao pertence\n");
 }
-*/
 
 int main (void)
 {
@@ -157,7 +152,6 @@ int main (void)
     teste_insere_inicio (l, MAX); 
     printf ("\n\n");
 
-/*
     printf ("Teste 4: esvaziar a lista retirando do inicio:\n");
     printf ("Esperado: tem que imprimir a lista 5 vezes, a cada vez sem o primeiro elemento\n");
     printf ("          Ao final, mostrar a mensagem 'lista vazia'\n");
@@ -205,7 +199,6 @@ int main (void)
     l = lista_cria ();
     lista_destroi (&l);
     printf ("\n\n");
-*/
+
     return 0;
 }
-
