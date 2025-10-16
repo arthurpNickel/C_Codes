@@ -38,6 +38,10 @@ struct lista *lista_cria ()
 /*depois resolver saporra*/
 void lista_destroi (struct lista **lista);
 
+/*
+ * Insere chave no inicio da lista. Retorna 1
+ * em caso de sucesso e 0 em caso de falha.
+*/
 int lista_insere_inicio (struct lista *lista, int chave)
 {
 	struct nodo *novo;
@@ -46,13 +50,6 @@ int lista_insere_inicio (struct lista *lista, int chave)
 		return 0;
 	
 	novo->chave = chave;
-	
-	/*Será que tem outra função que simplifica???*/
-	if (lista_vazia(lista))
-	{
-		lista->ini = novo;
-		novo->prox = NULL;
-	}
 	
 	/*troca de ponteiros*/
 	novo->prox = lista->ini; /*novo aponta para antigo primeiro nodo*/
@@ -69,14 +66,36 @@ int lista_insere_fim (struct lista *lista, int chave);
 
 int lista_insere_ordenado (struct lista *lista, int chave);
 
+/*
+ * Remove o elemento do inicio da lista e o retorna
+ * no parametro chave. Nao confundir com o retorno da funcao.
+ * A funcao retorna 1 em caso de sucesso e 0 no caso da lista estar vazia.
+*/
 int lista_remove_inicio (struct lista *lista, int *chave)
 {
-	*chave = 0;
+	struct lista aux; /*struct nodo ou lista?*/
+	
 	if (lista_vazia(lista))
 		return 0;
 	
+	*chave = lista->ini->chave;
+	
+	if (lista->tamanho == 1)
+	{
+		free(lista->ini);
+		lista->ini = NULL;
+		return 1;
+	}
+	
+	aux.ini = lista->ini;
+	
+	lista->ini = lista->ini->prox;
+	
+	free(aux.ini);
+	aux.ini = NULL;
+	
 	return 1;	
-	/*falta a remoção de verdade*/
+	
 }
 
 int lista_remove_fim (struct lista *lista, int *chave);
@@ -96,18 +115,25 @@ int lista_tamanho (struct lista *lista);
 
 int lista_pertence (struct lista *lista, int chave);
 
-/*!!!!*/
 void lista_inicia_iterador (struct lista *lista)
 {
-	/*??????*/
+	lista->ptr = lista->ini;
+	return;
 }
-/*!!!!*/
+
 int lista_incrementa_iterador (struct lista *lista, int *chave)
-{
+{	
+	/*quando *lista.*ptr guardar NULL, iterador para*/
 	if (lista->ptr == NULL)
 		return 0;
-		
-	/*dá para entender o que é para fazer pela descrição da função*/
+	
+	/* chave recebe a chave do nodo que a lista->ptr está apontando*/
+	*chave = lista->ptr->chave;
+	
+	/*anda na lista*/
+	lista->ptr = lista->ptr->prox;
+	
+	return 1;
 }
 
 /*
@@ -124,5 +150,20 @@ void lista_destroi (struct lista **lista)
 		free(aux->ini); /isso mesmo que dá free?/
 		aux->ini = NULL;
 	}
+}
+
+int lista_incrementa_iterador (struct lista *lista, int *chave)
+{
+	if (lista->ptr == NULL)
+		return 0;
+		
+	*chave = lista->ptr->chave;
+	
+	if (lista->ptr->prox == NULL)
+		return 0;
+	
+	lista->ptr = lista->ptr->prox;
+	
+	return 1;
 }
 */
