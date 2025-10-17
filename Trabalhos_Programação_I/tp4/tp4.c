@@ -56,7 +56,6 @@ void teste_insere_inicio (struct lista *l, int limite)
     }
 }
 
-/*
 void teste_insere_fim (struct lista *l, int limite)
 {
     int i;
@@ -71,8 +70,6 @@ void teste_insere_fim (struct lista *l, int limite)
     }
 }
 
-*/
-
 void teste_remove_inicio (struct lista *l)
 {
     int chave;
@@ -83,13 +80,11 @@ void teste_remove_inicio (struct lista *l)
             imprimir_lista (l);
 }
 
-/*
-
 void teste_remove_fim (struct lista *l)
 {
     int chave;
 
-    / remove todo mundo /
+    /* remove todo mundo */
     while (! lista_vazia (l))
         if (lista_remove_fim (l, &chave))
             imprimir_lista (l);
@@ -104,7 +99,7 @@ void teste_insere_ordenado (struct lista *l)
     lista_insere_ordenado (l, 14); imprimir_lista (l);
 }
 
-
+/*
 void teste_remove_ordenado (struct lista *l)
 {
     lista_remove_ordenado (l, 13); imprimir_lista (l);
@@ -165,7 +160,6 @@ int main (void)
     teste_remove_inicio (l); 
     printf ("\n\n");
 
-/*
     printf ("Teste 5: inserir 5 elementos no fim:\n");
     printf ("Esperado: tem que imprimir a lista 5 vezes, a cada vez com o maior elemento no fim\n");
     teste_insere_fim (l, MAX); 
@@ -183,6 +177,7 @@ int main (void)
     teste_insere_ordenado (l); 
     printf ("\n\n");
 
+/*
     printf ("Teste 8: remover 5 elementos em ordem:\n");
     printf ("Esperado: tem que imprimir a lista 5 vezes, sempre ordenada\n");
     printf ("          Ao final, mostrar a mensagem 'lista vazia'\n");

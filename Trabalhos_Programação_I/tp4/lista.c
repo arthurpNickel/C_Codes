@@ -61,44 +61,147 @@ int lista_insere_inicio (struct lista *lista, int chave)
 	return 1;
 }
 
-
-int lista_insere_fim (struct lista *lista, int chave);
-
-int lista_insere_ordenado (struct lista *lista, int chave);
+/*Dá para fazer sem aux -> dá boa?*/
+int lista_insere_fim (struct lista *lista, int chave)
+{
+	struct nodo *aux;
+	
+	/*cria novo nodo, aloca e atribui chave*/
+	struct nodo *novo;
+	if(!(novo = malloc(sizeof(struct nodo)))) /*aloca espaço para a o nodo*/
+		return 0;
+	novo->chave = chave;
+	
+	novo->prox = NULL; /*aterra novo, já que vai ficar no meio*/
+	
+	aux = lista->ini; /*aux aponta para início da lista*/
+	
+	lista->tamanho++;
+	
+	if (aux == NULL) /*se o vetor for vazio, insere no início*/
+	{
+		lista->ini = novo;
+		return 1;
+	}
+	
+	/*laço para aux apontar para o último nodo*/
+	while (aux->prox != NULL) /* ... */
+	{
+		/*anda na lista*/
+		aux = aux->prox; /* ... */
+	}
+	
+	aux->prox = novo; /*antigo último aponta para novo nodo*/
+	
+	return 1;	
+}
 
 /*
- * Remove o elemento do inicio da lista e o retorna
- * no parametro chave. Nao confundir com o retorno da funcao.
- * A funcao retorna 1 em caso de sucesso e 0 no caso da lista estar vazia.
+ * Insere chave em ordem na lista. Retorna 1
+ * em caso de sucesso e 0 em caso de falha.
 */
+int lista_insere_ordenado (struct lista *lista, int chave)
+{
+	struct nodo *aux;
+	
+	/*cria novo nodo, aloca e atribui chave*/
+	struct nodo *novo;
+	if(!(novo = malloc(sizeof(struct nodo)))) /*aloca espaço para a o nodo*/
+		return 0;
+	novo->chave = chave;
+	
+	aux = lista->ini; /*aux aponta para início da lista*/
+	
+	if (aux == NULL) /*se o vetor for vazio, insere no início*/
+	{
+		lista->ini = novo;
+		lista->tamanho++;
+		return 1;
+	}
+	
+	if (lista->tamanho == 1)
+	{
+		...
+	}
+	
+	/*laço para aux apontar para nodo anterior ao nodo novo ou para o último nodo*/
+	/* enquanto chave do próximo nodo for menor ou igual a chave ... */
+	while (aux->prox->chave <= *chave && aux->prox->prox != NULL)
+	{
+		/*anda na lista*/
+		aux = aux->prox; /* ... */
+	}
+	
+	novo->prox = aux->prox; /*novo aponta para o próximo ponteiro*/
+	
+	aux->prox = novo; /*nodo apontado por aux aponta para novo nodo*/
+	
+	lista->tamanho++;
+	
+	return 1;
+}
+
 int lista_remove_inicio (struct lista *lista, int *chave)
 {
-	struct lista aux; /*struct nodo ou lista?*/
+	struct nodo *aux;
 	
 	if (lista_vazia(lista))
 		return 0;
 	
 	*chave = lista->ini->chave;
 	
+	aux = lista->ini; /*auxiliar aponta para primeiro nodo*/
+	
+	lista->ini = lista->ini->prox; /*nodo cabeça aponta para segundo nodo*/
+	
+	/*desaloca espaço do primeiro nodo e aterra*/
+	free(aux);
+	aux = NULL;
+	
+	lista->tamanho--;
+	
+	return 1;
+}
+
+/*DÚVIDA: eu preciso aterrar o penúltimo, novo último, ou ao dar free no último ele já está aterrado?*/
+int lista_remove_fim (struct lista *lista, int *chave)
+{
+	struct nodo *aux;
+	
+	if (lista_vazia(lista))
+		return 0;
+	
+	aux = lista->ini; /*aux aponta para início da lista*/
+	
 	if (lista->tamanho == 1)
 	{
-		free(lista->ini);
+		*chave = aux->chave;
+		
+		free(aux);
 		lista->ini = NULL;
+		
+		lista->tamanho--;
+		
 		return 1;
 	}
 	
-	aux.ini = lista->ini;
+	/*laço para aux apontar para o penúltimo nodo*/
+	while (aux->prox->prox != NULL) /* ... */
+	{
+		/*anda na lista*/
+		aux = aux->prox; /* ... */
+	}
 	
-	lista->ini = lista->ini->prox;
+	*chave = aux->prox->chave;
 	
-	free(aux.ini);
-	aux.ini = NULL;
+	/*desaloca último nodo e aterra penúltimo*/
+	free(aux->prox);
+	aux->prox = NULL;
 	
-	return 1;	
+	lista->tamanho--;
 	
+	return 1;
 }
-
-int lista_remove_fim (struct lista *lista, int *chave);
 
 int lista_remove_ordenado (struct lista *lista, int chave);
 
@@ -118,7 +221,6 @@ int lista_pertence (struct lista *lista, int chave);
 void lista_inicia_iterador (struct lista *lista)
 {
 	lista->ptr = lista->ini;
-	return;
 }
 
 int lista_incrementa_iterador (struct lista *lista, int *chave)
