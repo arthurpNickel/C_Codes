@@ -100,6 +100,9 @@ int lista_insere_fim (struct lista *lista, int chave)
  * Insere chave em ordem na lista. Retorna 1
  * em caso de sucesso e 0 em caso de falha.
 */
+/* Juntar casos de lista única e inserção no primeiro -> mesma coisa
+   E ver se if e else fica melhor
+   Arrumar atribuição de tamanho*/
 int lista_insere_ordenado (struct lista *lista, int chave)
 {
 	struct nodo *aux;
@@ -110,33 +113,61 @@ int lista_insere_ordenado (struct lista *lista, int chave)
 		return 0;
 	novo->chave = chave;
 	
-	aux = lista->ini; /*aux aponta para início da lista*/
+	aux = lista->ini; /*aux aponta para início da lista!!!!*/
 	
-	if (aux == NULL) /*se o vetor for vazio, insere no início*/
+	if (aux == NULL) /*se a lista for vazia, insere no início*/
 	{
 		lista->ini = novo;
 		lista->tamanho++;
 		return 1;
 	}
 	
-	if (lista->tamanho == 1)
+	/*confirmar se precisa mesmo -> acho que não em*/
+	if (aux->prox == NULL)
 	{
-		...
+		lista->tamanho++;
+		
+		if (aux->chave >= chave)
+		{
+			novo->prox = aux; /*insere novo no primeiro*/
+			return 1;
+		}
+		
+		/*Ou insere novo no segundo*/
+		lista->ini->prox = novo;
+		novo->prox = NULL; /*!!!!!!!*/
+		return 1;
+	}
+	
+	/* verificando se primeiro nodo já tem chave maior que o novo */
+	if (aux->chave >= chave)
+	{
+		novo->prox = aux;
+		lista->ini = novo;
+		return 1;
 	}
 	
 	/*laço para aux apontar para nodo anterior ao nodo novo ou para o último nodo*/
 	/* enquanto chave do próximo nodo for menor ou igual a chave ... */
-	while (aux->prox->chave <= *chave && aux->prox->prox != NULL)
+	/*enquanto aux prox ou aux prox prox??*/
+	while (aux->prox->chave < chave && aux->prox->prox != NULL)
 	{
 		/*anda na lista*/
 		aux = aux->prox; /* ... */
 	}
 	
-	novo->prox = aux->prox; /*novo aponta para o próximo ponteiro*/
-	
-	aux->prox = novo; /*nodo apontado por aux aponta para novo nodo*/
-	
 	lista->tamanho++;
+	
+	if (aux->prox->chave >= chave)
+	{
+		novo->prox = aux->prox; /*novo aponta para o próximo ponteiro*/
+		aux->prox = novo; /*nodo apontado por aux aponta para novo nodo*/
+		return 1;
+	}
+	
+	/* se não, o nodo novo é o maior da lista: */
+	aux->prox->prox = novo; /*!!!!!!!!!!!!!!*/
+	novo->prox = NULL;
 	
 	return 1;
 }
@@ -203,7 +234,39 @@ int lista_remove_fim (struct lista *lista, int *chave)
 	return 1;
 }
 
-int lista_remove_ordenado (struct lista *lista, int chave);
+/*
+ * Remove o elemento chave da lista mantendo-a ordenada.
+ * A função considera que a chave esta presente na lista, quem chama
+ * esta funcao deve garantir isso.
+ * A funcao retorna 1 em caso de sucesso e 0 no caso da lista estar vazia.
+*/
+int lista_remove_ordenado (struct lista *lista, int chave)
+{
+	struct nodo *aux = lista->ini;
+	
+	if (lista_vazia(lista))
+		return 0;
+		
+	lista->tamanho--;
+	
+	if (aux->chave == chave)
+	{
+		free(aux);
+		lista->ini = NULL;
+		return 1;
+	}
+	
+	/*sem teste de fim da lista!!!*/
+	while (aux->prox->chave != chave) /* ... */
+	{
+		aux = aux->prox; /*anda na lista*/
+	}
+	
+	free(aux->prox);
+	aux->prox = NULL;
+	
+	return 1;
+}
 
 int lista_vazia (struct lista *lista)
 {
@@ -214,7 +277,10 @@ int lista_vazia (struct lista *lista)
 	/*assim ou verificando se lista->ini == NULL?*/
 }
 
-int lista_tamanho (struct lista *lista);
+int lista_tamanho (struct lista *lista)
+{
+	return lista->tamanho;
+}
 
 int lista_pertence (struct lista *lista, int chave);
 
@@ -268,4 +334,5 @@ int lista_incrementa_iterador (struct lista *lista, int *chave)
 	
 	return 1;
 }
+
 */
