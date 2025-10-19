@@ -35,8 +35,21 @@ struct lista *lista_cria ()
 	return l;
 }
 
-/*depois resolver saporra*/
-void lista_destroi (struct lista **lista);
+/* Desaloca toda memoria da lista e faz lista receber NULL. */
+void lista_destroi (struct lista **lista)
+{
+	struct nodo *aux = (*lista)->ini;
+
+	while (aux != NULL)
+	{
+		(*lista)->ini = (*lista)->ini->prox;
+		free(aux);
+		aux = (*lista)->ini;
+	}
+	
+	free(*lista);
+	*lista = NULL;
+}
 
 /*
  * Insere chave no inicio da lista. Retorna 1
@@ -85,11 +98,7 @@ int lista_insere_fim (struct lista *lista, int chave)
 	}
 	
 	/*laço para aux apontar para o último nodo*/
-	while (aux->prox != NULL) /* ... */
-	{
-		/*anda na lista*/
-		aux = aux->prox; /* ... */
-	}
+	while (aux->prox != NULL) aux = aux->prox; /*anda na lista*/
 	
 	aux->prox = novo; /*antigo último aponta para novo nodo*/
 	
@@ -144,17 +153,14 @@ int lista_insere_ordenado (struct lista *lista, int chave)
 	{
 		novo->prox = aux;
 		lista->ini = novo;
+		lista->tamanho++;
 		return 1;
 	}
 	
 	/*laço para aux apontar para nodo anterior ao nodo novo ou para o último nodo*/
 	/* enquanto chave do próximo nodo for menor ou igual a chave ... */
 	/*enquanto aux prox ou aux prox prox??*/
-	while (aux->prox->chave < chave && aux->prox->prox != NULL)
-	{
-		/*anda na lista*/
-		aux = aux->prox; /* ... */
-	}
+	while (aux->prox->chave < chave && aux->prox->prox != NULL) aux = aux->prox; /*anda na lista*/
 	
 	lista->tamanho++;
 	
@@ -217,11 +223,7 @@ int lista_remove_fim (struct lista *lista, int *chave)
 	}
 	
 	/*laço para aux apontar para o penúltimo nodo*/
-	while (aux->prox->prox != NULL) /* ... */
-	{
-		/*anda na lista*/
-		aux = aux->prox; /* ... */
-	}
+	while (aux->prox->prox != NULL) aux = aux->prox;
 	
 	*chave = aux->prox->chave;
 	
@@ -243,27 +245,29 @@ int lista_remove_fim (struct lista *lista, int *chave)
 int lista_remove_ordenado (struct lista *lista, int chave)
 {
 	struct nodo *aux = lista->ini;
+	struct nodo *removido;
 	
 	if (lista_vazia(lista))
 		return 0;
 		
 	lista->tamanho--;
 	
+	/* testar caso em que primeiro é o que se deve remover */
 	if (aux->chave == chave)
 	{
+		lista->ini = aux->prox;
 		free(aux);
-		lista->ini = NULL;
 		return 1;
 	}
 	
 	/*sem teste de fim da lista!!!*/
-	while (aux->prox->chave != chave) /* ... */
-	{
-		aux = aux->prox; /*anda na lista*/
-	}
+	while (aux->prox->chave != chave) aux = aux->prox; /*anda na lista*/
 	
-	free(aux->prox);
-	aux->prox = NULL;
+	removido = aux->prox; /*guarda o endereço do nodo que se quer remover*/
+	
+	aux->prox = aux->prox->prox; /*faz nodo anterior do removido apontar para o próximo do removido*/
+	
+	free(removido);
 	
 	return 1;
 }
@@ -282,7 +286,17 @@ int lista_tamanho (struct lista *lista)
 	return lista->tamanho;
 }
 
-int lista_pertence (struct lista *lista, int chave);
+int lista_pertence (struct lista *lista, int chave)
+{
+	struct nodo *aux = lista->ini;
+	
+	while (aux != NULL && aux->chave != chave) aux = aux->prox;
+	
+	if (aux == NULL)
+		return 0;
+	
+	return 1;
+}
 
 void lista_inicia_iterador (struct lista *lista)
 {
@@ -305,6 +319,9 @@ int lista_incrementa_iterador (struct lista *lista, int *chave)
 }
 
 /*
+
+Ver o que errei:
+
 void lista_destroi (struct lista **lista)
 {
 	struct lista aux;

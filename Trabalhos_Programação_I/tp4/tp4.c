@@ -108,7 +108,6 @@ void teste_remove_ordenado (struct lista *l)
     lista_remove_ordenado (l, 14); imprimir_lista (l);
 }
 
-/*
 void teste_de_pertinencia (struct lista *l)
 {
     lista_insere_inicio (l, 13);
@@ -116,7 +115,7 @@ void teste_de_pertinencia (struct lista *l)
     lista_insere_inicio (l, 11);
     lista_insere_inicio (l, 12);
     lista_insere_inicio (l, 14);
-    /imprimir_lista (l);/
+    /*imprimir_lista (l);*/
     imprimir_lista (l);
     if (lista_pertence (l, 11)) printf ("11 pertence\n");
     if (lista_pertence (l, 12)) printf ("12 pertence\n");
@@ -126,7 +125,6 @@ void teste_de_pertinencia (struct lista *l)
     if (! lista_pertence (l, 10)) printf ("10 nao pertence\n");
     if (! lista_pertence (l, 16)) printf ("16 nao pertence\n");
 }
-*/
 
 int main (void)
 {
@@ -183,7 +181,6 @@ int main (void)
     teste_remove_ordenado (l); 
     printf ("\n\n");
 
-/*
     printf ("Teste 9: teste de pertinencia \n");
     printf ("Esperado: apos imprimir a lista, tem que mostrar que de 11 a 15 pertence\n");
     printf ("          E que 10 e 16 nao pertencem\n");
@@ -202,7 +199,7 @@ int main (void)
     l = lista_cria ();
     lista_destroi (&l);
     printf ("\n\n");
-*/
+    
     return 0;
 }
 
