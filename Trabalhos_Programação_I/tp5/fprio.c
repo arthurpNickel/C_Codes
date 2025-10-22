@@ -26,14 +26,14 @@ struct fprio_t
 // Retorno: ponteiro para a fila criada ou NULL se erro.
 struct fprio_t *fprio_cria ()
 {
-	struct fprio_t *fprio;
-	if (!(fprio = malloc(sizeof(struct fprio_t))))
+	struct fprio_t *f;
+	if (!(f = malloc(sizeof(struct fprio_t))))
 		return NULL;
 	
-	fprio->prim = NULL;
-	fprio->num = 0;
+	f->prim = NULL;
+	f->num = 0;
 	
-	return fprio;
+	return f;
 }
 
 // Libera todas as estruturas de dados da fila, inclusive os itens.
@@ -46,6 +46,41 @@ struct fprio_t *fprio_destroi (struct fprio_t *f);
 // Inserir duas vezes o mesmo item (o mesmo ponteiro) é um erro.
 // Retorno: número de itens na fila após a operação ou -1 se erro.
 int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio);
+{
+	//prestar atenção com fifo >= < ...
+	
+	struct fpnodo_t *novo, *aux = f->prim;
+	if (!(novo = malloc(sizeof(struct fpnodo_t))))
+		return -1;
+	
+	novo->item = item; novo->tipo = tipo; novo->prio = prio; novo->prox = NULL;//Assim será?
+	
+	f->num++;
+	
+	//Preciso estar com o aux apontando para o nodo anterior onde vou inserir
+		//Consequência -> pensar caso para primeiro nodo
+	//Comparação com aux->prox->prio
+	//Para manter FIFO: novo->prio > aux->prox->prio
+	if (novo->prio > aux->prio)
+	{
+		novo->prox = aux;
+		f->prim = novo;
+		return 
+	}
+
+	//Caso de fila unitária???
+
+	/*laço que aponta para onde se deve inserir*/
+	while (aux->prox != NULL && novo->prio > aux->prox->prio) //Condição de parada certa???
+		aux = aux->prox;
+	
+	//Caso de último??
+
+	novo->prox = aux->prox;
+	aux->prox = novo;
+
+	return f->num;
+}
 
 // Retira o primeiro item da fila e o devolve; o tipo e a prioridade
 // do item são devolvidos nos parâmetros "tipo" e "prio".
@@ -54,10 +89,27 @@ void *fprio_retira (struct fprio_t *f, int *tipo, int *prio);
 
 // Informa o número de itens na fila.
 // Retorno: N >= 0 ou -1 se erro.
-int fprio_tamanho (struct fprio_t *f);
+int fprio_tamanho (struct fprio_t *f)
+{
+	return f->num;
+}
 
 // Imprime o conteúdo da fila no formato "(tipo prio) (tipo prio) ..."
 // Para cada item deve ser impresso seu tipo e sua prioridade, com um
 // espaço entre valores, sem espaços antes ou depois e sem nova linha.
-void fprio_imprime (struct fprio_t *f);
+void fprio_imprime (struct fprio_t *f)
+{
+	struct fpnodo_t *aux = f->prim;	
+	
+	if (f->num == 0) //Ou fazer uma função "fila vazia"?
+		return;
+	
+	/*Enquanto o valor do próximo nodo não for NULL*/
+	while (aux->prox) //Ou aux->prox != NULL?
+	{
+		printf("(%d %d) ", aux->tipo, aux->prio);
+		aux = aux->prox;
+	}
+	printf("(%d %d)", aux->tipo, aux->prio);
+}
 

@@ -84,9 +84,9 @@ int main ()
 {
   struct fprio_t *fp ;
   struct item_t *item ;
-  int tipo, prio, status ;
   int tipo_ant, prio_ant ;
-
+  int tipo, prio, status ;
+  
   // cria uma FP vazia
   printf ("Cria a fila:\n") ;
   fp = fprio_cria () ;
@@ -95,7 +95,6 @@ int main ()
   fprio_print (fp) ;
   printf ("\n") ;
 
-/*
   // cria e insere itens na FP
   printf ("Insere itens com prioridades crescentes:\n") ;
   for (int i = 0; i < 3; i++)
@@ -111,7 +110,8 @@ int main ()
     fprio_print (fp) ;
   }
   printf ("\n") ;
-
+  
+/*
   // insere mais eventos na LEF
   printf ("Insere itens com prioridades decrescentes:\n") ;
   for (int i = 3; i >= 0; i--)
