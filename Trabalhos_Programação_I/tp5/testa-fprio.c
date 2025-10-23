@@ -111,7 +111,6 @@ int main ()
   }
   printf ("\n") ;
   
-/*
   // insere mais eventos na LEF
   printf ("Insere itens com prioridades decrescentes:\n") ;
   for (int i = 3; i >= 0; i--)
@@ -145,7 +144,8 @@ int main ()
     fprio_print (fp) ;
   }
   printf ("\n") ;
-
+  
+/*
   // insere mais eventos na LEF
   printf ("Insere itens com prioridades crescentes:\n") ;
   for (int i = 1; i < 5; i++)

@@ -4,6 +4,7 @@
 // Implementação com lista encadeada simples
 
 #include <stdlib.h>
+#include <stdio.h>
 
 // descreve um nodo da fila de prioridades
 // NAO altere estas estruturas
@@ -45,7 +46,7 @@ struct fprio_t *fprio_destroi (struct fprio_t *f);
 // na ordem em que inseriu).
 // Inserir duas vezes o mesmo item (o mesmo ponteiro) é um erro.
 // Retorno: número de itens na fila após a operação ou -1 se erro.
-int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio);
+int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio)
 {
 	//prestar atenção com fifo >= < ...
 	
@@ -53,28 +54,24 @@ int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio);
 	if (!(novo = malloc(sizeof(struct fpnodo_t))))
 		return -1;
 	
-	novo->item = item; novo->tipo = tipo; novo->prio = prio; novo->prox = NULL;//Assim será?
+	novo->item = item; novo->tipo = tipo; novo->prio = prio; novo->prox = NULL;//Assim será? ; Precisa aterrar novo?
 	
 	f->num++;
 	
 	//Preciso estar com o aux apontando para o nodo anterior onde vou inserir
 		//Consequência -> pensar caso para primeiro nodo
 	//Comparação com aux->prox->prio
-	//Para manter FIFO: novo->prio > aux->prox->prio
-	if (novo->prio > aux->prio)
+	//Para manter FIFO: novo->prio < aux->prox->prio
+	if (aux == NULL || novo->prio < aux->prio)
 	{
 		novo->prox = aux;
 		f->prim = novo;
-		return 
+		return f->num;
 	}
 
-	//Caso de fila unitária???
-
 	/*laço que aponta para onde se deve inserir*/
-	while (aux->prox != NULL && novo->prio > aux->prox->prio) //Condição de parada certa???
+	while (aux->prox != NULL && novo->prio >= aux->prox->prio) //Condição de parada certa???
 		aux = aux->prox;
-	
-	//Caso de último??
 
 	novo->prox = aux->prox;
 	aux->prox = novo;
@@ -85,7 +82,17 @@ int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio);
 // Retira o primeiro item da fila e o devolve; o tipo e a prioridade
 // do item são devolvidos nos parâmetros "tipo" e "prio".
 // Retorno: ponteiro para o item retirado ou NULL se fila vazia ou erro.
-void *fprio_retira (struct fprio_t *f, int *tipo, int *prio);
+void *fprio_retira (struct fprio_t *f, int *tipo, int *prio)
+{
+	struct fpnodo_t removido = f->prim; //cpa nem precise
+	
+	*tipo = removido.tipo; //não sei se é assim mesmo
+	
+	//.... voltar aqui
+	
+	
+	//tem que dar free no item??
+}
 
 // Informa o número de itens na fila.
 // Retorno: N >= 0 ou -1 se erro.
@@ -112,4 +119,42 @@ void fprio_imprime (struct fprio_t *f)
 	}
 	printf("(%d %d)", aux->tipo, aux->prio);
 }
+
+/*
+
+Ordem decrescente de prioridade:
+
+int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio)
+{
+	//prestar atenção com fifo >= < ...
+	
+	struct fpnodo_t *novo, *aux = f->prim;
+	if (!(novo = malloc(sizeof(struct fpnodo_t))))
+		return -1;
+	
+	novo->item = item; novo->tipo = tipo; novo->prio = prio; novo->prox = NULL;//Assim será?
+	
+	f->num++;
+	
+	//Preciso estar com o aux apontando para o nodo anterior onde vou inserir
+		//Consequência -> pensar caso para primeiro nodo
+	//Comparação com aux->prox->prio
+	//Para manter FIFO: novo->prio > aux->prox->prio
+	if (aux == NULL || novo->prio > aux->prio)
+	{
+		novo->prox = aux;
+		f->prim = novo;
+		return f->num;
+	}
+
+	/ laço que aponta para onde se deve inserir /
+	while (aux->prox != NULL && novo->prio > aux->prox->prio) //Condição de parada certa???
+		aux = aux->prox;
+
+	novo->prox = aux->prox;
+	aux->prox = novo;
+
+	return f->num;
+}
+*/
 

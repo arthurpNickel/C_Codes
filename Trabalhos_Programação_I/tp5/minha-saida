@@ -1,0 +1,11 @@
+Cria a fila:
+Fila: (0 itens)
+
+Insere itens com prioridades crescentes:
+Insere item [0 0] com tipo 0 e prioridade 0
+Fila: (0 0) (1 item)
+Insere item [0 0] com tipo 0 e prioridade 1
+Fila: (0 1) (0 0) (2 itens)
+Insere item [0 0] com tipo 0 e prioridade 2
+Fila: (0 2) (0 1) (0 0) (3 itens)
+
