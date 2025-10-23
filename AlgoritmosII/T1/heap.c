@@ -70,6 +70,7 @@ int ChecaHeap(struct paciente v, int tam)
 	return 1;
 }
 
+/*NUnca feita*/
 void ImprimeHeap(int v, int tam)
 {
 	int i;
@@ -94,31 +95,31 @@ void HeapSort(struct paciente v, int tam)
 	for (i = tam; i > 1; i--)
 	{
 		troca(v[1], v[i]);
-		SacodeHeap();
+		SacodeHeap(v, i - 1);
 	}
 }
 
-/*Nunca feita*/
+/*Nunca feita
+ *atualizar a prioridade de algum paciente que piorou ou melhorou (AlteraHeap).
+ */
 AlteraHeap();
 
-SacodeHeap()
+void SacodeHeap(struct paciente v, int tam)
 {
-	int i = 1;
-	//tudo errado isso aqui
-	//laço
+	int i = 2;
+	
+	while (i <= tam)
 	{
-		if (v[i*2].prioridade > v[(i*2+1)].prioridade && v[i*2].prioridade > v[i].prioridade)
-		{
-			troca(v[i*2], v[i]);
-			i = i*2;
-		}
-		else if (v[i*2+1].prioridade > v[i].prioridade)
-		{
-			troca(v[i*2+1], v[i]);
-			i = i*2 + 1;
-		}
-		if ...
-			break
+		if (i < tam?? v[i+1].prioridade > v[i].prioridade) i++;
 		
+		if (v[i/2].prioridade >= v[i].prioridade) break;
+		
+		troca(v[i], v[i/2]);
+		
+		i = i*2;
+		/* Será?
+		if (v[i/2].prioridade < v[i].prioridade)
+			troca(v[i], v[i/2]);
+		*/
 	}
 }
