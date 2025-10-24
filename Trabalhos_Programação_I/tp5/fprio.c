@@ -39,24 +39,57 @@ struct fprio_t *fprio_cria ()
 
 // Libera todas as estruturas de dados da fila, inclusive os itens.
 // Retorno: NULL.
-struct fprio_t *fprio_destroi (struct fprio_t *f);
+struct fprio_t *fprio_destroi (struct fprio_t *f)
+{
+	//tem que fazer 1 milhão de verificações?
+	struct fpnodo_t *aux = f->prim;
+	
+	while (aux) //será que assim a condição??
+	{
+		f->prim = f->prim->prox;
+		
+		free(aux->item);
+		free(aux);
+		
+		aux = f->prim;
+	}
+	
+	free(f);
+	
+	//não dá para aterrar o *f ._.
+	
+	return NULL;
+}
 
 // Insere o item na fila, mantendo-a ordenada por prioridades crescentes.
 // Itens com a mesma prioridade devem respeitar a politica FIFO (retirar
 // na ordem em que inseriu).
 // Inserir duas vezes o mesmo item (o mesmo ponteiro) é um erro.
 // Retorno: número de itens na fila após a operação ou -1 se erro.
+
+//resolvo bagulho com item repetido? -> não pode ter dois nodos apontando para a mesma memória
+	//Vou ter que verificar tudo antes mesmo???
 int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio)
 {
 	//prestar atenção com fifo >= < ...
+	if (!f || !item) return -1;//boa prática? pode ter padrão de escrever código de erro assim?
 	
-	struct fpnodo_t *novo, *aux = f->prim;
+	struct fpnodo_t *aux = f->prim;
+	
+	/*verifica se tem item repetido na lista*/
+	while (aux && aux->item != item) //assim a condição?
+		aux = aux->prox;
+	if (aux) return -1;
+	
+	struct fpnodo_t *novo;
 	if (!(novo = malloc(sizeof(struct fpnodo_t))))
 		return -1;
 	
 	novo->item = item; novo->tipo = tipo; novo->prio = prio; novo->prox = NULL;//Assim será? ; Precisa aterrar novo?
 	
 	f->num++;
+	
+	aux = f->prim;
 	
 	//Preciso estar com o aux apontando para o nodo anterior onde vou inserir
 		//Consequência -> pensar caso para primeiro nodo
@@ -84,20 +117,32 @@ int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio)
 // Retorno: ponteiro para o item retirado ou NULL se fila vazia ou erro.
 void *fprio_retira (struct fprio_t *f, int *tipo, int *prio)
 {
-	struct fpnodo_t removido = f->prim; //cpa nem precise
+	//Pode fazer assim será?
+	if (!f || !tipo || !prio) //função própria ou só !f->prim -> dúvida para o prof?
+		return NULL;
 	
-	*tipo = removido.tipo; //não sei se é assim mesmo
+	struct fpnodo_t *aux = f->prim;
+	void *item_ptr;
+		
+	f->num--;
+		
+	item_ptr = f->prim->item;
+	*tipo = f->prim->tipo; //ou usar removido?
+	*prio = f->prim->prio;
 	
-	//.... voltar aqui
+	f->prim = aux->prox; /*f aponta para segundo da lista*/
 	
+	free(aux);
 	
-	//tem que dar free no item??
+	return item_ptr;
 }
 
 // Informa o número de itens na fila.
 // Retorno: N >= 0 ou -1 se erro.
 int fprio_tamanho (struct fprio_t *f)
 {
+	if (!f) return -1;
+
 	return f->num;
 }
 

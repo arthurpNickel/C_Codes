@@ -145,7 +145,6 @@ int main ()
   }
   printf ("\n") ;
   
-/*
   // insere mais eventos na LEF
   printf ("Insere itens com prioridades crescentes:\n") ;
   for (int i = 1; i < 5; i++)
@@ -194,7 +193,7 @@ int main ()
     fprio_print (fp) ;
   }
   printf ("\n") ;
-
+  
   // testa operações inválidas sobre lista ou valor inexistentes
   printf ("Testa operações com parâmetros inválidos:\n") ;
 
@@ -239,14 +238,13 @@ int main ()
     erro ("tamanho em fila NULL não retornou erro") ;
 
   printf ("\n") ;
-
+  
   // destroi a FP
   printf ("Destroi a fila:\n") ;
   fp = fprio_destroi (fp) ;
   fprio_print (fp) ;
   printf ("\n") ;
 
-*/
   // encerra
   return (0) ;
 }
