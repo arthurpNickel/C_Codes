@@ -101,8 +101,18 @@ void HeapSort(struct paciente v, int tam)
 
 /*Nunca feita
  *atualizar a prioridade de algum paciente que piorou ou melhorou (AlteraHeap).
- */
-AlteraHeap();
+ *se status = 0, paciente piorou
+ *se status = 1, paciente melhorou*/
+void AlteraHeap(struct paciente v, char nome, int melhorou)
+{
+	//como implementar essa busca pelo nome??
+	
+	if (melhorou)
+		troca(x, y);
+	
+	troca(x, z);
+	return;
+}
 
 void SacodeHeap(struct paciente v, int tam)
 {
