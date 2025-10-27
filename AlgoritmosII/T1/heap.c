@@ -44,16 +44,20 @@ void InsereHeap(struct paciente v, int *tam, int prioridade, char nome)
 }
 
 /*Nunca feita*/
-int RemoveHeap()
+struct paciente RemoveHeap(struct paciente v, int *tam)
 {
 	struct paciente removido = v[1];
 	
-	/*transformar em heap de novo
-	 *-> talvez colocar último em primeiro e sacudir*/
+	v[1] = v[tam];
+	
+	*tam--;
+	
+	SacodeHeap(v, tam);
 	
 	return removido;
 }
 
+/*Reportar número de comparações e trocas!*/
 void Heapfy(struct paciente v, int tam)
 {
 	int i;
@@ -86,6 +90,7 @@ void ImprimeHeap(int v, int tam)
 	//imprimir char
 }
 
+/*Reportar número de comparações e trocas*/
 void HeapSort(struct paciente v, int tam)
 {
 	int i;

@@ -28,7 +28,7 @@ struct fprio_t
 struct fprio_t *fprio_cria ()
 {
 	struct fprio_t *f;
-	if (!(f = malloc(sizeof(struct fprio_t))))
+	if (!(f = malloc(sizeof(struct fprio_t)))) //estilo condição?
 		return NULL;
 	
 	f->prim = NULL;
@@ -41,22 +41,21 @@ struct fprio_t *fprio_cria ()
 // Retorno: NULL.
 struct fprio_t *fprio_destroi (struct fprio_t *f)
 {
-	//tem que fazer 1 milhão de verificações?
 	struct fpnodo_t *aux = f->prim;
 	
-	while (aux) //será que assim a condição??
+	while (aux) //estilo condição?
 	{
-		f->prim = f->prim->prox;
+		f->prim = f->prim->prox; /*f aponta para segundo nodo ou é aterrado*/
 		
-		free(aux->item);
+		free(aux->item); /*Libera primeiro nodo*/
 		free(aux);
 		
-		aux = f->prim;
+		aux = f->prim; /*aux aponta para o próximo ou é aterrado*/
 	}
 	
 	free(f);
 	
-	//não dá para aterrar o *f ._.
+	//aterramento de *f?
 	
 	return NULL;
 }
@@ -66,41 +65,38 @@ struct fprio_t *fprio_destroi (struct fprio_t *f)
 // na ordem em que inseriu).
 // Inserir duas vezes o mesmo item (o mesmo ponteiro) é um erro.
 // Retorno: número de itens na fila após a operação ou -1 se erro.
-
-//resolvo bagulho com item repetido? -> não pode ter dois nodos apontando para a mesma memória
-	//Vou ter que verificar tudo antes mesmo???
 int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio)
-{
-	//prestar atenção com fifo >= < ...
-	if (!f || !item) return -1;//boa prática? pode ter padrão de escrever código de erro assim?
+{	
+	struct fpnodo_t *aux, *novo;
 	
-	struct fpnodo_t *aux = f->prim;
+	if (!f || !item) return -1;//estilo condição? identação?
+	
+	aux = f->prim;
 	
 	/*verifica se tem item repetido na lista*/
-	while (aux && aux->item != item) //assim a condição?
+	while (aux && aux->item != item) //estilo condição?
 		aux = aux->prox;
-	if (aux) return -1;
+	if (aux) return -1; //identação?
 	
-	struct fpnodo_t *novo;
+	/*cria novo nodo*/
 	if (!(novo = malloc(sizeof(struct fpnodo_t))))
 		return -1;
-	
-	novo->item = item; novo->tipo = tipo; novo->prio = prio; novo->prox = NULL;//Assim será? ; Precisa aterrar novo?
+	novo->item = item; novo->tipo = tipo; novo->prio = prio;//identação?
 	
 	f->num++;
 	
 	aux = f->prim;
 	
-	//Preciso estar com o aux apontando para o nodo anterior onde vou inserir
-		//Consequência -> pensar caso para primeiro nodo
-	//Comparação com aux->prox->prio
-	//Para manter FIFO: novo->prio < aux->prox->prio
-	if (aux == NULL || novo->prio < aux->prio)
+	/*verificar se insere no primeiro*/
+	if (aux == NULL || novo->prio < aux->prio) //condição? fila vazia?
 	{
-		novo->prox = aux;
+		novo->prox = aux; /*aponta para segundo nodo ou aterra*/
 		f->prim = novo;
 		return f->num;
 	}
+	
+	//Comparação com aux->prox->prio
+	//Para manter FIFO: novo->prio < aux->prox->prio
 
 	/*laço que aponta para onde se deve inserir*/
 	while (aux->prox != NULL && novo->prio >= aux->prox->prio) //Condição de parada certa???
