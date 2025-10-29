@@ -23,6 +23,10 @@ struct fprio_t
   int num ;         // número de itens na fila
 } ;
 
+
+/*Colocar mais comentários e fazer fila vazia!*/
+
+
 // Cria uma fila vazia.
 // Retorno: ponteiro para a fila criada ou NULL se erro.
 struct fprio_t *fprio_cria ()
@@ -94,12 +98,9 @@ int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio)
 		f->prim = novo;
 		return f->num;
 	}
-	
-	//Comparação com aux->prox->prio
-	//Para manter FIFO: novo->prio < aux->prox->prio
 
 	/*laço que aponta para onde se deve inserir*/
-	while (aux->prox != NULL && novo->prio >= aux->prox->prio) //Condição de parada certa???
+	while (aux->prox != NULL && novo->prio >= aux->prox->prio) /*mantém FIFO*/
 		aux = aux->prox;
 
 	novo->prox = aux->prox;
@@ -112,18 +113,18 @@ int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio)
 // do item são devolvidos nos parâmetros "tipo" e "prio".
 // Retorno: ponteiro para o item retirado ou NULL se fila vazia ou erro.
 void *fprio_retira (struct fprio_t *f, int *tipo, int *prio)
-{
-	//Pode fazer assim será?
-	if (!f || !tipo || !prio) //função própria ou só !f->prim -> dúvida para o prof?
-		return NULL;
-	
-	struct fpnodo_t *aux = f->prim;
+{	
+	struct fpnodo_t *aux;
 	void *item_ptr;
+
+	if (!f || !tipo || !prio || !f->prim) return NULL; //condição identação?
+	
+	aux = f->prim;
 		
 	f->num--;
 		
 	item_ptr = f->prim->item;
-	*tipo = f->prim->tipo; //ou usar removido?
+	*tipo = f->prim->tipo;
 	*prio = f->prim->prio;
 	
 	f->prim = aux->prox; /*f aponta para segundo da lista*/
@@ -137,7 +138,7 @@ void *fprio_retira (struct fprio_t *f, int *tipo, int *prio)
 // Retorno: N >= 0 ou -1 se erro.
 int fprio_tamanho (struct fprio_t *f)
 {
-	if (!f) return -1;
+	if (!f) return -1; //condição e identação?
 
 	return f->num;
 }
@@ -149,11 +150,10 @@ void fprio_imprime (struct fprio_t *f)
 {
 	struct fpnodo_t *aux = f->prim;	
 	
-	if (f->num == 0) //Ou fazer uma função "fila vazia"?
-		return;
+	if (f->num == 0) return; //identação? lista vazia -> 3
 	
 	/*Enquanto o valor do próximo nodo não for NULL*/
-	while (aux->prox) //Ou aux->prox != NULL?
+	while (aux->prox) //condição?
 	{
 		printf("(%d %d) ", aux->tipo, aux->prio);
 		aux = aux->prox;
