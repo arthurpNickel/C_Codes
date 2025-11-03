@@ -1,5 +1,9 @@
 /*Implementação do Tipo Abstrato de Dados Heap*/
 
+//fazer mudanças para funcionar com o heap.h
+
+//Tam vai ficar dentro de uma struct do heap
+
 //Infermeira vai mandar uma struct ou só os parâmetros?
 
 struct paciente
@@ -16,8 +20,9 @@ void troca(struct paciente *a, struct paciente *b);
 }
 
 /*Nunca feita*/
-int *InicHeap(int *tam)
+struct paciente *InicHeap(int *tam)
 {
+	//fila[500]??
 	struct paciente v[500];
 	*tam = 0;
 	return v;
@@ -43,7 +48,9 @@ void InsereHeap(struct paciente v, int *tam, int prioridade, char nome)
 	*tam++;
 }
 
-/*Nunca feita*/
+/*Nunca feita
+ *Como fazer para retornar erro se a fila estiver vazia??
+ **/
 struct paciente RemoveHeap(struct paciente v, int *tam)
 {
 	struct paciente removido = v[1];
