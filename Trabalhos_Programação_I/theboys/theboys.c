@@ -46,7 +46,7 @@ struct Missao
 struct Mundo 
 {
 	int nherois;
-	struct Heroi herois[]; 
+	struct Heroi herois[]; //Revisar isso aqui!!!!!
 	int nbases;
 	struct Base bases[]; 
 	int nmissoes;
