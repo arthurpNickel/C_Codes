@@ -2,10 +2,17 @@
 // Autor: xxxxx, GRR xxxxxx
 
 // seus #includes vão aqui
+#include <stdio.h>
+#include <stdlib>
+#include "fila.h"
+#include "lista.h"
+#include "conjunto.h"
 
 // seus #defines vão aqui
 
 // minimize o uso de variáveis globais
+
+//onde fica o fprio???
 
 //Tudo são inteiros iguais ou maiores que zero
 struct Heroi 
@@ -48,14 +55,28 @@ struct Mundo
 	int nherois;
 	struct Heroi herois[]; //Revisar isso aqui!!!!!
 	int nbases;
-	struct Base bases[]; 
+	struct Base bases[]; //revisar isso
 	int nmissoes;
-	struct Missao missoes[];
+	struct Missao missoes[]; //revisar isso
 	int nhabilidades;
 	int ncompostos; //Compostos V!!!!!!!!!!
 	struct Coord tam_mundo;
 	int relogio;
 }
+
+... evento_chega(struct heroi *h, int b, int t)
+{
+	int espera;
+	h->base = b;
+
+	if (mundo.bases[b].fila_espera->fila_tamanho < mundo.bases[b].lotacao && //precisa dessa primeira verificação???!!!!!!!!!!!!!!!!!!!!!!
+		mundo.bases[b].fila_espera->fila_tamanho == 0) //eu posso acessar mundo???????!!!!!!!!!!!!!!!!
+		espera = 1;
+	else //com else mesmo?? não dá para colocar um return??!!!!!!!!!!!!!!!!!!
+		espera = 
+
+}
+
 // programa principal
 int main ()
 {
@@ -81,8 +102,8 @@ int main ()
 		mundo.herois[i].velocidade = rand() % 5000 + 50;
 
 		/* Heroi terá uma quantidade aleatória de habilidadades, também aleatórias */
-		mundo.herois.habilidades = cjto_cria(rand() % 3 + 1); //tá bom???????
-		for (int j = 0; j < mundo.herois[i].habilidades.cap; j++)
+		mundo.herois[i].habilidades = cjto_cria(rand() % 3 + 1); //tá bom???????
+		for (int j = 0; j < mundo.herois[i].habilidades->cap; j++)
 		{
 			hab = rand() % mundo.nhabilidades + 1;
 			cjto_insere(mundo.herois[i].habilidades, hab); //verificar se é assim mesmo!!!!!!
@@ -115,16 +136,55 @@ int main ()
 			cjto_insere(mundo.missoes[i].habilidades_m, hab);
 		}
 	}
-
-
 	
 	//verificar se o que eu fiz ali em cima ta certo
 
+	/* Eventos Iniciais */
+
+	struct lista *LEF = lista_cria();
+	int b, t;
+
+	/* Cada herói chegará em alguma base dentro de 3 dias */
+	for (int i = 0; i < mundo.nherois; i++)
+	{
+		b = rand() % mundo.nbases-1 + 0; //verificar se tá certo!!!!!!!!!!
+		t = rand() % 4320 + 0;
+		lista_insere_ordenado(evento_chega(t, mundo.herois[i].id)); //assim que insere evento na LEF??
+	}
+
+	/* Cada missão irá ocorrer em algum momento */
+	for (int i = 0; i < mundo.nmissoes; i++)
+	{
+		t = rand() % fim_do_mundo + 0;
+		lista_insere_ordenado(evento_missao(t, mundo.missoes[i].id)); //ver se é assim !!!!!!!!!!!!!
+	}
+
+	/* Evento que finalizará a mundo */
+	t = fim_do_mundo;
+	lista_insere_ordenado(t);
+
+	// executar o laço de simulação
 
 
-  // executar o laço de simulação
+	/* Destruição do mundo */
+	
+	/* Destruição dos conjuntos de habilidades dos heróis */
+	for (int i = 0; i < mundo.nherois; i++)
+	{
+		for (int j = 0; j < mundo.herois[i].habilidades->cap; j++)
+			cjto_destroi(mundo.herois[i].habilidades); //verificar se é assim mesmo!!!!!!
+	}
 
-  // destruir o mundo
+	/* Destruição dos conjuntos de presentes e das filas de espera de todas as bases */
+	for (int i = 0; i < mundo.nbases; i++)
+	{
+		cjto_destroi(mundo.bases[i].presentes);
+		fila_destroi(mundo.bases[i].fila_espera);
+	}
+
+	/* Destruição do conjunto de habilidade de todas as missões*/
+	for (int i = 0; i < mundo.nmissoes; i++)
+		cjto_destroi(mundo.missoes[i].habilidades_m);
 
   return (0) ;
 }
