@@ -1,14 +1,19 @@
 // programa principal do projeto "The Boys - 2024/2"
-// Autor: xxxxx, GRR xxxxxx
+// Autor: Arthur Paul Nickel, GRR 20252825
 
 // seus #includes vão aqui
 #include <stdio.h>
-#include <stdlib>
+#include <stdlib.h>
 #include "fila.h"
 #include "lista.h"
 #include "conjunto.h"
 
 // seus #defines vão aqui
+#define NHABILIDADES 10
+#define FIMMUNDO 525600
+#define NHEROIS NHABILIDADES * 5
+#define NBASES NHEROIS / 5
+#define NMISSOES FIMMUNDO / 100
 
 // minimize o uso de variáveis globais
 
@@ -53,17 +58,18 @@ struct Missao
 struct Mundo 
 {
 	int nherois;
-	struct Heroi herois[]; //Revisar isso aqui!!!!!
+	struct Heroi herois[NHEROIS]; //Número constante assim mesmo?
 	int nbases;
-	struct Base bases[]; //revisar isso
+	struct Base bases[NBASES]; //revisar isso
 	int nmissoes;
-	struct Missao missoes[]; //revisar isso
+	struct Missao missoes[NMISSOES]; //revisar isso
 	int nhabilidades;
 	int ncompostos; //Compostos V!!!!!!!!!!
 	struct Coord tam_mundo;
 	int relogio;
-}
+} ;
 
+/*
 ... evento_chega(struct heroi *h, int b, int t)
 {
 	int espera;
@@ -76,6 +82,7 @@ struct Mundo
 		espera = 
 
 }
+*/
 
 // programa principal
 int main ()
@@ -130,7 +137,7 @@ int main ()
 		mundo.missoes[i].local.y = rand() % mundo.tam_mundo.y-1 + 0;
 
 		mundo.missoes[i].habilidades_m = cjto_cria(rand() % 10 + 6); 
-		for (int j = 0; j < mundo.missoes[i].habilidades_m.cap; j++)
+		for (int j = 0; j < mundo.missoes[i].habilidades_m->cap; j++)
 		{
 			hab = rand() % mundo.nhabilidades + 1;
 			cjto_insere(mundo.missoes[i].habilidades_m, hab);
@@ -140,11 +147,11 @@ int main ()
 	//verificar se o que eu fiz ali em cima ta certo
 
 	/* Eventos Iniciais */
-
+	/*
 	struct lista *LEF = lista_cria();
 	int b, t;
 
-	/* Cada herói chegará em alguma base dentro de 3 dias */
+	/ Cada herói chegará em alguma base dentro de 3 dias /
 	for (int i = 0; i < mundo.nherois; i++)
 	{
 		b = rand() % mundo.nbases-1 + 0; //verificar se tá certo!!!!!!!!!!
@@ -152,16 +159,19 @@ int main ()
 		lista_insere_ordenado(evento_chega(t, mundo.herois[i].id)); //assim que insere evento na LEF??
 	}
 
-	/* Cada missão irá ocorrer em algum momento */
+	/ Cada missão irá ocorrer em algum momento /
 	for (int i = 0; i < mundo.nmissoes; i++)
 	{
 		t = rand() % fim_do_mundo + 0;
 		lista_insere_ordenado(evento_missao(t, mundo.missoes[i].id)); //ver se é assim !!!!!!!!!!!!!
 	}
+	*/
 
-	/* Evento que finalizará a mundo */
+	/*
+	/ Evento que finalizará a mundo /
 	t = fim_do_mundo;
 	lista_insere_ordenado(t);
+	*/
 
 	// executar o laço de simulação
 
