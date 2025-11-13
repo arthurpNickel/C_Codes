@@ -2,32 +2,14 @@
 #include <stdlib.h>
 #include "fila.h"
 
-#ifndef FILA
-#define FILA
-
 //Testar!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-// descreve um nodo da fila 
-struct fila_nodo_t
-{
-	int item;					// item associado ao nodo
-	struct fila_nodo_t *prox;	// próximo nodo
-};
-
-// descreve uma fila 
-struct fila_t
-{
-	struct fila_nodo_t *prim ;	// primeiro nodo da fila
-	struct fila_nodo_t *ult ;	// último nodo da fila
-	int num ;					// número de itens na fila
-};
 
 // Cria uma fila vazia.
 // Retorno: ponteiro para a fila criada ou NULL se erro.
 struct fila_t *fila_cria ()
 {
-	struct fila_t f;
-	if (!(f = malloc(sizeof(struct fila_t))));
+	struct fila_t *f;
+	if (!(f = malloc(sizeof(struct fila_t))))
 		return NULL;
 	
 	return f;
@@ -41,7 +23,7 @@ struct fila_t *fila_destroi (struct fila_t *f);
 // Retorno: 1 se tiver sucesso ou 0 se falhar.
 int fila_insere (struct fila_t *f, int item)
 {
-	struct fila_nodo_t novo;
+	struct fila_nodo_t *novo;
 
 	if (f == NULL)
 		return 0;
@@ -103,7 +85,7 @@ int fila_retira (struct fila_t *f, int *item)
 int fila_tamanho (struct fila_t *f)
 {
     if (f == NULL)
-        return -1
+        return -1;
     
     return f->num;
 }
@@ -139,5 +121,3 @@ void fila_imprime (struct fila_t *f)
     }
     printf("%d\n", aux->item);   
 }
-
-#endif
