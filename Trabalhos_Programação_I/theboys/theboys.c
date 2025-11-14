@@ -17,6 +17,18 @@
 #define NMISSOES FIMMUNDO / 100
 #define TAMMUNDO 20000
 
+/* Eventos */
+#define CHEGA 1
+#define ESPERA 2
+#define DESISTE 3
+#define AVISA 4
+#define ENTRA 5
+#define SAI 6
+#define VIAJA 7
+#define MORRE 8
+#define MISSAO 9
+#define FIM 10
+
 // minimize o uso de variáveis globais
 
 //onde fica o fprio???
@@ -77,7 +89,8 @@ int main ()
 {
 	/* Iniciar entidades e atributos -> modular? */
 	struct Mundo mundo;
-	int hab, h, b, t, fim_do_mundo = FIMMUNDO;
+	int codigo_evento, tempo, hab, h, b, t, fim_do_mundo = FIMMUNDO;
+	void *evento_atual;
 
 	mundo.relogio = 0;
 	mundo.tam_mundo.x = TAMMUNDO; //verificar se é isso mesmo!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -138,15 +151,15 @@ int main ()
 	/* Cada herói chegará em alguma base dentro de 3 dias */
 	for (int i = 0; i < mundo.nherois; i++)
 	{
-		/* Aloca o evento */
+		/* Cria o evento */
 		struct chega *c;
     	if(!(c = malloc(sizeof(struct chega))))
         	return;
-
 		c->heroi = i;
 		c->base = rand() % mundo.nbases-1 + 0; //verificar se tá certo!!!!!!!!!!
 		c->tempo = rand() % 4320 + 0;
-		fprio_insere();
+
+		fprio_insere(mundo.LEF, c, CHEGA, c->tempo); //verificar se é isso!!!!!!!!!!!!!!!!!!!!!
 	}
 
 	/ Cada missão irá ocorrer em algum momento /
@@ -164,6 +177,14 @@ int main ()
 	*/
 
 	// executar o laço de simulação
+
+	/* Evento atual aponta para a struct do próximo evento */
+	evento_atual = fprio_retira(mundo.LEF, &codigo_evento, &tempo);
+
+	switch (codigo_evento) /* Escolhe o próximo evento a ser realizado na simulação de acordo com o código*/
+	{
+		case CHEGA {evento_chega(mundo, evento_atual), break};
+	}
 
 
 	/* Destruição do mundo */
