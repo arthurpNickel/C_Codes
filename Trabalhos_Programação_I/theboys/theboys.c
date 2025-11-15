@@ -8,88 +8,18 @@
 #include "lista.h"
 #include "conjunto.h"
 #include "fprio.h"
+#include "eventos.h"
 
 // seus #defines vão aqui
-#define NHABILIDADES 10
-#define FIMMUNDO 525600
-#define NHEROIS NHABILIDADES * 5
-#define NBASES NHEROIS / 5
-#define NMISSOES FIMMUNDO / 100
-#define TAMMUNDO 20000
-
-/* Eventos */
-#define CHEGA 1
-#define ESPERA 2
-#define DESISTE 3
-#define AVISA 4
-#define ENTRA 5
-#define SAI 6
-#define VIAJA 7
-#define MORRE 8
-#define MISSAO 9
-#define FIM 10
 
 // minimize o uso de variáveis globais
-
-//onde fica o fprio???
-
-//Tudo são inteiros iguais ou maiores que zero
-struct Heroi 
-{
-	int id;
-	struct cjto_t *habilidades;
-	int paciencia;
-	int velocidade;
-	int xp;
-	int base;
-} ;
-
-struct Coord 
-{
-	int x;
-	int y;
-} ;
-
-struct Base 
-{
-	int id;
-	int lotacao; //número máximo de heróis
-
-	//Assim será????
-	struct cjto_t *presentes; //conjunto de IDs dos heróis presentes na base
-	struct fila_t *fila_espera; //fila de heróis esperando para entrar na base -> é uma fila normal
-
-	struct Coord local;
-} ;
-
-struct Missao 
-{
-	int id;
-	struct cjto_t *habilidades_m; //conjunto de habilidades necessárias
-	struct Coord local;
-} ;
-
-struct Mundo 
-{
-	int nherois;
-	struct Heroi herois[NHEROIS]; //Número constante assim mesmo?
-	int nbases;
-	struct Base bases[NBASES]; //revisar isso
-	int nmissoes;
-	struct Missao missoes[NMISSOES]; //revisar isso
-	int nhabilidades;
-	int ncompostos; //Compostos V!!!!!!!!!!
-	struct Coord tam_mundo;
-	int relogio;
-	struct fprio_t *LEF;
-} ;
 
 // programa principal
 int main ()
 {
 	/* Iniciar entidades e atributos -> modular? */
 	struct Mundo mundo;
-	int codigo_evento, tempo, hab, h, b, t, fim_do_mundo = FIMMUNDO;
+	int codigo_evento, tempo, hab, fim_do_mundo = FIMMUNDO;
 	void *evento_atual;
 
 	mundo.relogio = 0;
@@ -153,38 +83,52 @@ int main ()
 	{
 		/* Cria o evento */
 		struct chega *c;
-    	if(!(c = malloc(sizeof(struct chega))))
-        	return;
+    	if (!(c = malloc(sizeof(struct chega))))
+        	return 1;
+		
 		c->heroi = i;
 		c->base = rand() % mundo.nbases-1 + 0; //verificar se tá certo!!!!!!!!!!
 		c->tempo = rand() % 4320 + 0;
 
 		fprio_insere(mundo.LEF, c, CHEGA, c->tempo); //verificar se é isso!!!!!!!!!!!!!!!!!!!!!
 	}
-
+/*
 	/ Cada missão irá ocorrer em algum momento /
 	for (int i = 0; i < mundo.nmissoes; i++)
 	{
 		t = rand() % fim_do_mundo + 0;
 		fprio_insere(evento_missao(t, mundo.missoes[i].id)); //ver se é assim !!!!!!!!!!!!!
 	}
-	*/
+*/
 
-	/
 	/* Evento que finalizará a mundo */
-	t = fim_do_mundo;
-	fprio_insere(t) //arrumar isso!!!!!!!!!!!!!!!!!
-	*/
+	struct fim *f;
+	if (!(f = malloc(sizeof(struct fim))))
+		return 1; //return o que?!!!!!!!!!!!!!!!!!!!!!!!!!
+	f->tempo = FIMMUNDO;
 
-	// executar o laço de simulação
+	fprio_insere(mundo.LEF, f, FIM, FIMMUNDO);
 
-	/* Evento atual aponta para a struct do próximo evento */
-	evento_atual = fprio_retira(mundo.LEF, &codigo_evento, &tempo);
 
-	switch (codigo_evento) /* Escolhe o próximo evento a ser realizado na simulação de acordo com o código*/
-	{
-		case CHEGA {evento_chega(mundo, evento_atual), break};
-	}
+	/* Laço da simulação */
+	do {
+		/* Evento atual aponta para a struct do próximo evento */
+		evento_atual = fprio_retira(mundo.LEF, &codigo_evento, &tempo);
+
+		switch (codigo_evento) /* Escolhe o próximo evento a ser realizado na simulação de acordo com o código*/
+		{
+			case CHEGA:
+				evento_chega(&mundo, evento_atual);
+				break;
+
+			case FIM:
+				printf("fim do mundo\n");
+				break;
+
+			default:
+				break;
+		}
+	} while (codigo_evento != FIM);
 
 
 	/* Destruição do mundo */
@@ -200,13 +144,15 @@ int main ()
 	for (int i = 0; i < mundo.nbases; i++)
 	{
 		cjto_destroi(mundo.bases[i].presentes);
-		fila_destroi(mundo.bases[i].fila_espera);
+		mundo.bases[i].fila_espera = (mundo.bases[i].fila_espera);
 	}
 
 	/* Destruição do conjunto de habilidade de todas as missões*/
 	for (int i = 0; i < mundo.nmissoes; i++)
 		cjto_destroi(mundo.missoes[i].habilidades_m);
 
+	/* Destruição da LEF */
+	mundo.LEF = fprio_destroi(mundo.LEF);
+
   return (0) ;
 }
-

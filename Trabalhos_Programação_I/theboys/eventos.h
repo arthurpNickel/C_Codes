@@ -1,6 +1,84 @@
 #ifndef EVENTOS
 #define EVENTOS
 
+#include "fila.h"
+#include "lista.h"
+#include "conjunto.h"
+#include "fprio.h"
+
+/* Eventos */
+#define CHEGA 1
+#define ESPERA 2
+#define DESISTE 3
+#define AVISA 4
+#define ENTRA 5
+#define SAI 6
+#define VIAJA 7
+#define MORRE 8
+#define MISSAO 9
+#define FIM 10
+
+//Tirar daqui depois tudo isso!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+// seus #defines vão aqui
+#define NHABILIDADES 10
+#define FIMMUNDO 525600
+#define NHEROIS NHABILIDADES * 5
+#define NBASES NHEROIS / 5
+#define NMISSOES FIMMUNDO / 100
+#define TAMMUNDO 20000
+
+//Tudo são inteiros iguais ou maiores que zero
+struct Heroi 
+{
+	int id;
+	struct cjto_t *habilidades;
+	int paciencia;
+	int velocidade;
+	int xp;
+	int base;
+} ;
+
+struct Coord 
+{
+	int x;
+	int y;
+} ;
+
+struct Base 
+{
+	int id;
+	int lotacao; //número máximo de heróis
+
+	//Assim será????
+	struct cjto_t *presentes; //conjunto de IDs dos heróis presentes na base
+	struct fila_t *fila_espera; //fila de heróis esperando para entrar na base -> é uma fila normal
+
+	struct Coord local;
+} ;
+
+struct Missao 
+{
+	int id;
+	struct cjto_t *habilidades_m; //conjunto de habilidades necessárias
+	struct Coord local;
+} ;
+
+struct Mundo 
+{
+	int nherois;
+	struct Heroi herois[NHEROIS]; //Número constante assim mesmo?
+	int nbases;
+	struct Base bases[NBASES]; //revisar isso
+	int nmissoes;
+	struct Missao missoes[NMISSOES]; //revisar isso
+	int nhabilidades;
+	int ncompostos; //Compostos V!!!!!!!!!!
+	struct Coord tam_mundo;
+	int relogio;
+	struct fprio_t *LEF;
+} ;
+
 struct chega
 {
     int tempo;
@@ -29,6 +107,11 @@ struct avisa
     int base; 
 } ;
 
+struct fim
+{
+    int tempo;
+} ;
+
 /*Herói h chegando na base b no instante t. Ao chegar, o
 herói analisa o tamanho da fila e decide se espera para entrar ou desiste*/
 void evento_chega(struct Mundo *m, struct chega *c);
@@ -43,3 +126,5 @@ void evento_desiste(struct Mundo *m, struct espera *d);
 
 /*O porteiro da base B trata a fila de espera:*/
 void evento_avisa(struct Mundo *m, struct avisa *a);
+
+#endif
