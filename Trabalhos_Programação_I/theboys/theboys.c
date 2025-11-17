@@ -22,6 +22,8 @@ int main ()
 	int codigo_evento, tempo, hab, fim_do_mundo = FIMMUNDO;
 	void *evento_atual;
 
+	srand(0);
+
 	mundo.relogio = 0;
 	mundo.tam_mundo.x = TAMMUNDO; //verificar se é isso mesmo!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	mundo.tam_mundo.y = TAMMUNDO;
@@ -37,14 +39,14 @@ int main ()
 	{
 		mundo.herois[i].id = i;
 		mundo.herois[i].xp = 0;
-		mundo.herois[i].paciencia = rand() % 100 + 0; //1 a 100
-		mundo.herois[i].velocidade = rand() % 5000 + 50;
+		mundo.herois[i].paciencia = rand() % 101; //0 a 100
+		mundo.herois[i].velocidade = 50 + rand() % 4951; //50 a 5000
 
 		/* Heroi terá uma quantidade aleatória de habilidadades, também aleatórias */
-		mundo.herois[i].habilidades = cjto_cria(rand() % 3 + 1); //tá bom???????
+		mundo.herois[i].habilidades = cjto_cria(1 + rand() % 4); //1 a 3
 		for (int j = 0; j < mundo.herois[i].habilidades->cap; j++)
 		{
-			hab = rand() % mundo.nhabilidades + 1;
+			hab = 1 + rand() % mundo.nhabilidades; //1 a NHABILIDADES
 			cjto_insere(mundo.herois[i].habilidades, hab); //verificar se é assim mesmo!!!!!!
 		}
 	}
@@ -53,9 +55,9 @@ int main ()
 	for (int i = 0; i < mundo.nbases; i++)
 	{
 		mundo.bases[i].id = i;
-		mundo.bases[i].local.x = rand() % mundo.tam_mundo.x-1 + 0;
-		mundo.bases[i].local.y = rand() % mundo.tam_mundo.y-1 + 0;
-		mundo.bases[i].lotacao = rand() % 10 + 5;
+		mundo.bases[i].local.x = rand() % mundo.tam_mundo.x; //0 a TAMMUNDO-1
+		mundo.bases[i].local.y = rand() % mundo.tam_mundo.y; //0 a TAMMUNDO-1
+		mundo.bases[i].lotacao = 3 + rand() % 11; //3 a 10
 	
 		mundo.bases[i].presentes = cjto_cria(mundo.bases[i].lotacao);
 		mundo.bases[i].fila_espera = fila_cria();
@@ -65,13 +67,13 @@ int main ()
 	for (int i = 0; i < mundo.nmissoes; i++)
 	{
 		mundo.missoes[i].id = i;
-		mundo.missoes[i].local.x = rand() % mundo.tam_mundo.x-1 + 0;
-		mundo.missoes[i].local.y = rand() % mundo.tam_mundo.y-1 + 0;
+		mundo.missoes[i].local.x = rand() % mundo.tam_mundo.x; //0 a TAMMUNDO-1
+		mundo.missoes[i].local.y = rand() % mundo.tam_mundo.y; //0 a TAMMUNDO-1
 
-		mundo.missoes[i].habilidades_m = cjto_cria(rand() % 10 + 6); 
+		mundo.missoes[i].habilidades_m = cjto_cria(6 + rand() % 5);  //6 a 10
 		for (int j = 0; j < mundo.missoes[i].habilidades_m->cap; j++)
 		{
-			hab = rand() % mundo.nhabilidades + 1;
+			hab = 1 + rand() % mundo.nhabilidades; //1 a NHABILIDADES
 			cjto_insere(mundo.missoes[i].habilidades_m, hab);
 		}
 	}
@@ -87,8 +89,8 @@ int main ()
         	return 1;
 		
 		c->heroi = i;
-		c->base = rand() % mundo.nbases-1 + 0; //verificar se tá certo!!!!!!!!!!
-		c->tempo = rand() % 4320 + 0;
+		c->base = rand() % mundo.nbases; //0 a NBASES-1 verificar se tá certo!!!!!!!!!!
+		c->tempo = rand() % 4321; //0 a 4320
 
 		fprio_insere(mundo.LEF, c, CHEGA, c->tempo); //verificar se é isso!!!!!!!!!!!!!!!!!!!!!
 	}
@@ -96,7 +98,7 @@ int main ()
 	/ Cada missão irá ocorrer em algum momento /
 	for (int i = 0; i < mundo.nmissoes; i++)
 	{
-		t = rand() % fim_do_mundo + 0;
+		t = rand() % ...;
 		fprio_insere(evento_missao(t, mundo.missoes[i].id)); //ver se é assim !!!!!!!!!!!!!
 	}
 */
@@ -135,16 +137,13 @@ int main ()
 	
 	/* Destruição dos conjuntos de habilidades dos heróis */
 	for (int i = 0; i < mundo.nherois; i++)
-	{
-		for (int j = 0; j < mundo.herois[i].habilidades->cap; j++)
-			cjto_destroi(mundo.herois[i].habilidades); //verificar se é assim mesmo!!!!!!
-	}
+		cjto_destroi(mundo.herois[i].habilidades); //verificar se é assim mesmo!!!!!!
 
 	/* Destruição dos conjuntos de presentes e das filas de espera de todas as bases */
 	for (int i = 0; i < mundo.nbases; i++)
 	{
 		cjto_destroi(mundo.bases[i].presentes);
-		mundo.bases[i].fila_espera = (mundo.bases[i].fila_espera);
+		mundo.bases[i].fila_espera = fila_destroi(mundo.bases[i].fila_espera);
 	}
 
 	/* Destruição do conjunto de habilidade de todas as missões*/

@@ -15,7 +15,7 @@ void evento_chega(struct Mundo *m, struct chega *c)
 	struct desiste *d;
 
 	//função específica???!!!!!!!!!!!!!!!!!!!!!!!!!!
-	printf("%6d: CHEGA HEROI %2d BASE %d (%2d/%2d)", c->tempo, c->heroi, c->base, 
+	printf("%6d: CHEGA HEROI %2d BASE %d (%2d/%2d) ", c->tempo, c->heroi, c->base, 
 			m->bases[c->base].fila_espera->num, m->bases[c->base].lotacao);
 
 	//acesso de mundo errado!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -30,6 +30,8 @@ void evento_chega(struct Mundo *m, struct chega *c)
     
     if (espera)
     {
+		printf("ESPERA\n");
+
         /* Cria evento espera e insere na LEF*/
 		if(!(e = malloc(sizeof(struct espera))))
 			return;
@@ -41,6 +43,8 @@ void evento_chega(struct Mundo *m, struct chega *c)
 
 		return;
     }
+
+	printf("DESISTE\n");
 	
 	/* Cria evento desiste e insere na LEF*/
 	if(!(d = malloc(sizeof(struct desiste))))

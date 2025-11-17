@@ -17,7 +17,24 @@ struct fila_t *fila_cria ()
 
 // Libera todas as estruturas de dados da fila, inclusive os itens.
 // Retorno: NULL.
-struct fila_t *fila_destroi (struct fila_t *f);
+struct fila_t *fila_destroi (struct fila_t *f)
+{
+	struct fila_nodo_t *aux = f->prim;
+	
+	/*Enquanto aux não estiver aterrado*/
+	while (aux != NULL)
+	{
+		f->prim = f->prim->prox; /*f aponta para segundo nodo ou é aterrado*/
+		
+		free(aux); /*Libera primeiro nodo*/
+		
+		aux = f->prim; /*aux aponta para o próximo ou é aterrado*/
+	}
+	
+	free(f);
+	
+	return NULL;
+}
 
 // Insere um item no final da fila (politica FIFO).
 // Retorno: 1 se tiver sucesso ou 0 se falhar.
