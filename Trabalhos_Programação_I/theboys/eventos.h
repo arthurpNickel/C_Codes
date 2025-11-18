@@ -52,6 +52,8 @@ struct Base
 
 	//Assim será????
 	struct cjto_t *presentes; //conjunto de IDs dos heróis presentes na base
+
+	//verificar se é fila ou lista!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	struct fila_t *fila_espera; //fila de heróis esperando para entrar na base -> é uma fila normal
 
 	struct Coord local;
@@ -103,9 +105,22 @@ struct desiste
 struct avisa
 {
     int tempo;
-    int heroi; //não sei!!!!!!!!!!!!!!!!!
     int base; 
 } ;
+
+struct entra
+{
+	int tempo;
+	int heroi;
+	int base;
+} ;
+
+struct viaja
+{
+	int tempo;
+	int heroi;
+	int base_destino;
+}
 
 struct fim
 {

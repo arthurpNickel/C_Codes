@@ -11,6 +11,10 @@ struct fila_t *fila_cria ()
 	struct fila_t *f;
 	if (!(f = malloc(sizeof(struct fila_t))))
 		return NULL;
+
+    f->prim = NULL;
+    f->ult = NULL;
+    f->num = 0;
 	
 	return f;
 }
@@ -45,16 +49,23 @@ int fila_insere (struct fila_t *f, int item)
 	if (f == NULL)
 		return 0;
 	
-	if (!(novo = malloc(sizeof(struct fila_t))))
+	if (!(novo = malloc(sizeof(struct fila_nodo_t))))
 		return 0;
 	
 	novo->prox = NULL;
 	novo->item = item;
 
+    f->num++;
+
+    if (f->prim == NULL) /* Testa fila vazia */
+    {
+        f->prim = novo;
+        f->ult = novo;
+        return 1;
+    }
+
 	f->ult->prox = novo;
 	f->ult = novo;
-
-	f->num++;
 
 	return 1;
 }
@@ -65,34 +76,20 @@ int fila_retira (struct fila_t *f, int *item)
 {
     struct fila_nodo_t *aux;
     
-    if (f == NULL)
-        return 0;
-    
-    aux = f->prim;
-
-    if (aux == NULL) /* Caso em que fila está vazia */
+    if (f == NULL || f->prim == NULL) /* Caso em que fila está nula ou vazia */
         return 0;
 
-    *item = f->ult->item;
+    *item = f->prim->item;
 
     f->num--;
 
-    /* Encontrar penúltimo para poder aterrar */
+    /*Desalocar primeiro nodo*/
+    aux = f->prim;
+    f->prim = f->prim->prox; /* f aponta ou para o próximo da fila ou é aterrado */
+    free(aux);
 
-    if (f->num == 0) /* Caso em que a fila tem um elemento */
-    {
-        free(f->prim);
-        f->prim = NULL;
-        return 1; 
-    }
-
-    /* Enquanto aux não apontar para o antepenúltimo, ele anda na fila */
-    while (aux->prox != f->ult)
-        aux = aux->prox;
-    
-    free(f->ult);
-    aux->prox = NULL;
-    f->ult = aux;
+    if (f->prim == NULL) /* Se fila esvaziar, aterrar último*/
+        f->ult = NULL;
 
     return 1;
 }

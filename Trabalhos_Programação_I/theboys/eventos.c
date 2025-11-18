@@ -18,7 +18,6 @@ void evento_chega(struct Mundo *m, struct chega *c)
 	printf("%6d: CHEGA HEROI %2d BASE %d (%2d/%2d) ", c->tempo, c->heroi, c->base, 
 			m->bases[c->base].fila_espera->num, m->bases[c->base].lotacao);
 
-	//acesso de mundo errado!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	m->herois[c->heroi].base = c->base; /* Muda ID da base que herói se encontra no momento*/
 
 	if (m->bases[c->base].fila_espera->num < m->bases[c->base].lotacao && //precisa dessa primeira verificação???!!!!!!!!!!!!!!!!!!!!!!
@@ -32,7 +31,8 @@ void evento_chega(struct Mundo *m, struct chega *c)
     {
 		printf("ESPERA\n");
 
-        /* Cria evento espera e insere na LEF*/
+		//modular?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        /* Cria evento espera e insere na LEF (mesmos atributos do evento chega) */
 		if(!(e = malloc(sizeof(struct espera))))
 			return;
 		e->tempo = c->tempo;
@@ -46,7 +46,7 @@ void evento_chega(struct Mundo *m, struct chega *c)
 
 	printf("DESISTE\n");
 	
-	/* Cria evento desiste e insere na LEF*/
+	/* Cria evento desiste e insere na LEF (mesmos atributos do evento chega) */
 	if(!(d = malloc(sizeof(struct desiste))))
 		return;
 	d->tempo = c->tempo;
@@ -56,17 +56,66 @@ void evento_chega(struct Mundo *m, struct chega *c)
 	fprio_insere(m->LEF, d, DESISTE, d->tempo);
 }
 
-/*
-
-/ O herói H entra na fila de espera da base B. Assim que H entrar na fila, o
-porteiro da base B deve ser avisado para verificar a fila: /
+/* O herói H entra na fila de espera da base B. Assim que H entrar na fila, o
+porteiro da base B deve ser avisado para verificar a fila: */
 void evento_espera(struct Mundo *m, struct espera *e)
 {
-	fila_insere(mundo.bases[e->base].fila_espera); //algum caso de erro???!!!!!!!!
+	struct avisa *a;
+
+	printf("%6d: ESPERA HEROI %2d BASE %d (%2d)\n", e->tempo, e->heroi, e->base, 
+			m->bases[e->base].fila_espera->num);
+	
+	//É esse o item mesmo????
+	//verificar se é fila ou lista!!!!!!!!!!!!!!!!!!!!!!!!
+	fila_insere(m->bases[e->base].fila_espera, e->heroi); //algum caso de erro???!!!!!!!!
+
+	/* Cria evento avisa e insere na LEF */
+	if (!(a = malloc(sizeof(struct avisa))))
+		return;
+	a->tempo = e->tempo;
+	a->base = e->base;
+
+	fprio_insere(m->LEF, a, AVISA, a->tempo);
+}
+
+/*O herói H desiste de entrar na base B, escolhe uma base aleatória D e viaja
+para lá:*/
+void evento_desiste(struct Mundo *m, struct espera *d)
+{
+	struct viaja *v;
+	int destino; //precisa?!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	destino = rand() % (m->nbases); /* Escolhe uma base aleatória */
 
 }
 
-/ O porteiro da base B trata a fila de espera: /
-void evento_avisa(struct Mundo *m, struct avisa *a);
+/* O porteiro da base B trata a fila de espera: */
+void evento_avisa(struct Mundo *m, struct avisa *a)
+{
+	struct entra *in;
+	int h;
+	
+	//como vou fazer essa porra????
+	/*printf("%6d: AVISA PORTEIRO BASE %d (%2d/%2d) FILA [ %2d %2d ... ]")*/
 
-*/
+	//m->bases[a->base].lotacao ou m->bases[a->base].presentes->cap???!!!!!!!!!!!!!!!!!!!!!!!
+	while (m->bases[a->base].lotacao > m->bases[a->base].presentes->num && m->bases[a->base].fila_espera->num != 0)
+	{
+		//verificar se é fila mesmo!!!!!!!!!!!!!!!!!!!!!!
+		fila_retira(m->bases[a->base].fila_espera, &h);
+		cjto_insere(m->bases[a->base].presentes, h);
+
+		printf("%6d: AVISA PORTEIRO BASE %d ADMITE %2d\n", a->tempo, a->base, h);
+
+		/* Cria evento entra e insere na LEF */
+		if(!(in = malloc(sizeof(struct entra))))
+			return;
+		in->tempo = a->tempo;
+		in->heroi = h;
+		in->base = a->base;
+
+		fprio_insere(m->LEF, in, ENTRA, in->tempo);
+	}
+}
+
+

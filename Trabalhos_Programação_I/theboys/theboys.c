@@ -60,6 +60,8 @@ int main ()
 		mundo.bases[i].lotacao = 3 + rand() % 11; //3 a 10
 	
 		mundo.bases[i].presentes = cjto_cria(mundo.bases[i].lotacao);
+
+		//verificar se é fila ou lista!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		mundo.bases[i].fila_espera = fila_cria();
 	}
 
@@ -123,6 +125,18 @@ int main ()
 				evento_chega(&mundo, evento_atual);
 				break;
 
+			case ESPERA:
+				evento_espera(&mundo, evento_atual);
+				break;
+
+			case DESISTE
+				evento_desiste(&mundo, evento_atual);
+				break;
+			
+			case AVISA:
+				evento_avisa(&mundo, evento_atual);
+				break;
+
 			case FIM:
 				printf("fim do mundo\n");
 				break;
@@ -130,6 +144,9 @@ int main ()
 			default:
 				break;
 		}
+
+		free(evento_atual);
+
 	} while (codigo_evento != FIM);
 
 
@@ -143,6 +160,7 @@ int main ()
 	for (int i = 0; i < mundo.nbases; i++)
 	{
 		cjto_destroi(mundo.bases[i].presentes);
+		//verificar se é fila ou lista!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		mundo.bases[i].fila_espera = fila_destroi(mundo.bases[i].fila_espera);
 	}
 
