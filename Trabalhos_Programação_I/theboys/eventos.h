@@ -54,7 +54,7 @@ struct Base
 	struct cjto_t *presentes; //conjunto de IDs dos heróis presentes na base
 
 	//verificar se é fila ou lista!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	struct fila_t *fila_espera; //fila de heróis esperando para entrar na base -> é uma fila normal
+	struct lista *fila_espera; //fila de heróis esperando para entrar na base -> é uma fila normal
 
 	struct Coord local;
 } ;
@@ -115,12 +115,19 @@ struct entra
 	int base;
 } ;
 
+struct sai
+{
+	int tempo;
+	int heroi;
+	int base;
+} ;
+
 struct viaja
 {
 	int tempo;
 	int heroi;
-	int base_destino;
-}
+	int destino;
+} ;
 
 struct fim
 {
@@ -141,5 +148,13 @@ void evento_desiste(struct Mundo *m, struct espera *d);
 
 /*O porteiro da base B trata a fila de espera:*/
 void evento_avisa(struct Mundo *m, struct avisa *a);
+
+/*O herói H entra na base B. Ao entrar, o herói decide quanto tempo vai ficar e
+agenda sua saída da base*/
+void evento_entra(struct Mundo *m, struct entra *in);
+
+/*O herói H sai da base B. Ao sair, escolhe uma base de destino para viajar; o
+porteiro de B é avisado, pois uma vaga foi liberada*/
+void evento_sai(struct Mundo *m, struct sai *s);
 
 #endif

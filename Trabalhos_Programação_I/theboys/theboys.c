@@ -62,7 +62,7 @@ int main ()
 		mundo.bases[i].presentes = cjto_cria(mundo.bases[i].lotacao);
 
 		//verificar se é fila ou lista!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		mundo.bases[i].fila_espera = fila_cria();
+		mundo.bases[i].fila_espera = lista_cria();
 	}
 
 	/* Inicialização das missões */
@@ -129,12 +129,20 @@ int main ()
 				evento_espera(&mundo, evento_atual);
 				break;
 
-			case DESISTE
+			case DESISTE:
 				evento_desiste(&mundo, evento_atual);
 				break;
 			
 			case AVISA:
 				evento_avisa(&mundo, evento_atual);
+				break;
+
+			case ENTRA:
+				evento_entra(&mundo, evento_atual);
+				break;
+
+			case SAI:
+				evento_sai(&mundo, evento_atual);
 				break;
 
 			case FIM:
@@ -161,7 +169,7 @@ int main ()
 	{
 		cjto_destroi(mundo.bases[i].presentes);
 		//verificar se é fila ou lista!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		mundo.bases[i].fila_espera = fila_destroi(mundo.bases[i].fila_espera);
+		lista_destroi(&mundo.bases[i].fila_espera);
 	}
 
 	/* Destruição do conjunto de habilidade de todas as missões*/
