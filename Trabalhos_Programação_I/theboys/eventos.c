@@ -1,8 +1,6 @@
 /* Implementação dos eventos */
 
 #include "eventos.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 //cria dentro ou fora do evento os eventos???
 
@@ -135,6 +133,8 @@ void evento_entra(struct Mundo *m, struct entra *in)
 	struct sai *s;
 	int TPB = 15 + m->herois[in->heroi].paciencia * (1 + rand() % 20); //1 a 20
 
+	m->herois[in->heroi].base = in->base; /* Atualiza estrutura do herói */
+
 	/* Cria evento sai e insere na LEF */
 	if(!(s = malloc(sizeof(struct entra))))
 		return;
@@ -184,4 +184,50 @@ void evento_sai(struct Mundo *m, struct sai *s)
 			m->bases[s->base].presentes->num, m->bases[s->base].lotacao);
 }
 
+//qual o sentido disso?????!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+/*O herói H se desloca para uma base D (que pode ser a mesma onde já está)*/
+void evento_viaja(struct Mundo *m, struct viaja *v)
+{
+	struct chega *c;
+	int distancia, duracao;
+
+	/* Cálculo da distância e da duração */
+	distancia = sqrt((m->herois[v->heroi].base)*(m->herois[v->heroi].base) + (v->destino)*(v->destino));
+
+	duracao = distancia / m->herois[v->heroi].velocidade;
+
+	/* Cria evento chega e insere na LEF */
+	if(!(c = malloc(sizeof(struct chega))))
+		return;
+	c->tempo = v->tempo + duracao;
+	c->heroi = v->heroi;
+	c->base = v->destino;
+
+	fprio_insere(m->LEF, c, CHEGA, c->tempo);
+
+	//não sei se tá bom esse acesso a base antiga!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
+	printf("%6d: VIAJA HEROI %2d BASE %d BASE %d DIST %d VEL %d CHEGA %d\n",
+			v->tempo, v->heroi, m->herois[v->heroi].base, v->destino, 
+			distancia, m->herois[v->heroi].velocidade, c->tempo);
+}
+
+/*O herói H morre no instante T.*/
+void evento_morre(struct Mundo *m, struct morre *mo)
+{
+	struct avisa *a;
+
+	cjto_retira(m->bases[mo->base].presentes, mo->heroi); /* Retira herói da base em que se encontra */
+
+	//Como mudo status do herói??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	/* Cria evento avisa e insere na LEF */
+	if (!(a = malloc(sizeof(struct avisa))))
+		return;
+	a->tempo = mo->tempo;
+	a->base = mo->base;
+
+	fprio_insere(m->LEF, a, AVISA, a->tempo);
+
+	printf("%6d: MORRE HEROI %2d MISSAO %d\n", mo->tempo, mo->heroi, 0);
+}
 

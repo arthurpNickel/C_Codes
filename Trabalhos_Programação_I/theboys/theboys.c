@@ -19,7 +19,7 @@ int main ()
 {
 	/* Iniciar entidades e atributos -> modular? */
 	struct Mundo mundo;
-	int codigo_evento, tempo, hab, fim_do_mundo = FIMMUNDO;
+	int codigo_evento, tempo, hab;
 	void *evento_atual;
 
 	srand(0);
@@ -27,12 +27,12 @@ int main ()
 	mundo.relogio = 0;
 	mundo.tam_mundo.x = TAMMUNDO; //verificar se é isso mesmo!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	mundo.tam_mundo.y = TAMMUNDO;
-	mundo.nhabilidades = 10;
-	mundo.nherois = mundo.nhabilidades * 5;
-	mundo.nbases = mundo.nherois / 5;
-	mundo.nmissoes = fim_do_mundo / 100;
-	mundo.ncompostos = mundo.nhabilidades * 3;
-	mundo.LEF = fprio_cria();
+	mundo.nhabilidades = NHABILIDADES;
+	mundo.nherois = NHEROIS;
+	mundo.nbases = NBASES;
+	mundo.nmissoes = NMISSOES;
+	mundo.ncompostos = NCOMPOSTOS;
+	mundo.LEF = fprio_cria(); /* LEF é uma fila de prioridade, com prioridade = tempo */
 
 	/* Inicialização dos heróis */
 	for (int i = 0; i < mundo.nherois; i++)
@@ -47,7 +47,7 @@ int main ()
 		for (int j = 0; j < mundo.herois[i].habilidades->cap; j++)
 		{
 			hab = 1 + rand() % mundo.nhabilidades; //1 a NHABILIDADES
-			cjto_insere(mundo.herois[i].habilidades, hab); //verificar se é assim mesmo!!!!!!
+			cjto_insere(mundo.herois[i].habilidades, hab); //verificar se é assim mesmo!!!!!!!!!!!!!!!
 		}
 	}
 
@@ -113,7 +113,6 @@ int main ()
 
 	fprio_insere(mundo.LEF, f, FIM, FIMMUNDO);
 
-
 	/* Laço da simulação */
 	do {
 		/* Evento atual aponta para a struct do próximo evento */
@@ -143,6 +142,14 @@ int main ()
 
 			case SAI:
 				evento_sai(&mundo, evento_atual);
+				break;
+
+			case VIAJA:
+				evento_viaja(&mundo, evento_atual);
+				break;
+
+			case MORRE:
+				evento_morre(&mundo, evento_atual);
 				break;
 
 			case FIM:

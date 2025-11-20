@@ -1,6 +1,10 @@
 #ifndef EVENTOS
 #define EVENTOS
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
 #include "fila.h"
 #include "lista.h"
 #include "conjunto.h"
@@ -27,6 +31,7 @@
 #define NBASES NHEROIS / 5
 #define NMISSOES FIMMUNDO / 100
 #define TAMMUNDO 20000
+#define NCOMPOSTOS NHABILIDADES * 3
 
 //Tudo são inteiros iguais ou maiores que zero
 struct Heroi 
@@ -129,6 +134,19 @@ struct viaja
 	int destino;
 } ;
 
+struct morre
+{
+	int heroi;
+	int tempo;
+	int base;
+} ;
+
+struct missao
+{
+	int tempo;
+	int missao; //isso mesmo?!!!!!!!!!!!!!!!!!!!!!!!
+} ;
+
 struct fim
 {
     int tempo;
@@ -156,5 +174,15 @@ void evento_entra(struct Mundo *m, struct entra *in);
 /*O herói H sai da base B. Ao sair, escolhe uma base de destino para viajar; o
 porteiro de B é avisado, pois uma vaga foi liberada*/
 void evento_sai(struct Mundo *m, struct sai *s);
+
+/*O herói H se desloca para uma base D (que pode ser a mesma onde já está)*/
+void evento_viaja(struct Mundo *m, struct viaja *v);
+
+/*O herói H morre no instante T.*/
+void evento_morre(struct Mundo *m, struct morre *mo);
+
+//evento missão
+
+//evento fim
 
 #endif
