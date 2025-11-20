@@ -2,8 +2,6 @@
 
 #include "eventos.h"
 
-//cria dentro ou fora do evento os eventos???
-
 /*Herói h chegando na base b no instante t. Ao chegar, o
 herói analisa o tamanho da fila e decide se espera para entrar ou desiste*/
 void evento_chega(struct Mundo *m, struct chega *c)
@@ -11,10 +9,6 @@ void evento_chega(struct Mundo *m, struct chega *c)
 	int espera;
 	struct espera *e;
 	struct desiste *d;
-
-	//função específica???!!!!!!!!!!!!!!!!!!!!!!!!!!
-	printf("%6d: CHEGA HEROI %2d BASE %d (%2d/%2d) ", c->tempo, c->heroi, c->base, 
-			lista_tamanho(m->bases[c->base].fila_espera), m->bases[c->base].lotacao);
 
 	m->herois[c->heroi].base = c->base; /* Muda ID da base que herói se encontra no momento*/
 
@@ -52,6 +46,9 @@ void evento_chega(struct Mundo *m, struct chega *c)
 	d->base = c->base;
 	
 	fprio_insere(m->LEF, d, DESISTE, d->tempo);
+
+	printf("%6d: CHEGA HEROI %2d BASE %d (%2d/%2d) ",
+		c->tempo, c->heroi, c->base, lista_tamanho(m->bases[c->base].fila_espera), m->bases[c->base].lotacao);
 }
 
 /* O herói H entra na fila de espera da base B. Assim que H entrar na fila, o
@@ -59,11 +56,7 @@ porteiro da base B deve ser avisado para verificar a fila: */
 void evento_espera(struct Mundo *m, struct espera *e)
 {
 	struct avisa *a;
-
-	printf("%6d: ESPERA HEROI %2d BASE %d (%2d)\n", e->tempo, e->heroi, e->base, 
-			lista_tamanho(m->bases[e->base].fila_espera));
 	
-	//É esse o item mesmo????
 	//verificar se é fila ou lista!!!!!!!!!!!!!!!!!!!!!!!!
 	lista_insere_fim(m->bases[e->base].fila_espera, e->heroi); //algum caso de erro???!!!!!!!!
 
@@ -74,16 +67,17 @@ void evento_espera(struct Mundo *m, struct espera *e)
 	a->base = e->base;
 
 	fprio_insere(m->LEF, a, AVISA, a->tempo);
+
+	printf("%6d: ESPERA HEROI %2d BASE %d (%2d)\n",
+			e->tempo, e->heroi, e->base, lista_tamanho(m->bases[e->base].fila_espera));
 }
 
 /*O herói H desiste de entrar na base B, escolhe uma base aleatória D e viaja
-para lá:*/
+para lá*/
 void evento_desiste(struct Mundo *m, struct espera *d)
 {
 	struct viaja *v;
 	int destino; //precisa?!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-	printf("%6d: DESISTE HEROI %2d BASE %d\n", d->tempo, d->heroi, d->base);
 
 	destino = rand() % m->nbases; /* Escolhe uma base aleatória */
 
@@ -95,6 +89,10 @@ void evento_desiste(struct Mundo *m, struct espera *d)
 	v->destino = destino; //pode colocar direto o rand aqui!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	fprio_insere(m->LEF, v, VIAJA, v->tempo);
+
+	printf("%6d: DESISTE HEROI %2d BASE %d\n",
+			d->tempo, d->heroi, d->base);
+
 }
 
 /* O porteiro da base B trata a fila de espera: */
@@ -103,17 +101,34 @@ void evento_avisa(struct Mundo *m, struct avisa *a)
 	struct entra *in;
 	int h;
 	
-	//como vou fazer essa porra????
-	/*printf("%6d: AVISA PORTEIRO BASE %d (%2d/%2d) FILA [ %2d %2d ... ]")*/
+	printf("%6d: AVISA PORTEIRO BASE %d (%2d/%2d) FILA [ ", 
+			a->tempo, a->base, lista_tamanho(m->bases[a->base].fila_espera), m->bases[a->base].lotacao);
+			//FILA [ %2d %2d  ]"
+	
+	//modular?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	/*------------Impressão da fila de espera-------------*/
+	if (lista_vazia(m->bases[a->base].fila_espera))
+	{
+		printf ("]\n");
+		return;
+	}
+	
+	lista_inicia_iterador(m->bases[a->base].fila_espera);
+
+	lista_incrementa_iterador (m->bases[a->base].fila_espera, &h);
+	printf ("%d", h);
+	while (lista_incrementa_iterador(m->bases[a->base].fila_espera, &h))
+		printf (" %d", h);
+	printf (" ]\n");
+	/*----------------------------------------------------*/
 
 	//m->bases[a->base].lotacao ou m->bases[a->base].presentes->cap???!!!!!!!!!!!!!!!!!!!!!!!
-	while (m->bases[a->base].lotacao > m->bases[a->base].presentes->num && lista_tamanho(m->bases[a->base].fila_espera) != 0)
+	while (m->bases[a->base].lotacao > m->bases[a->base].presentes->num 
+			&& lista_tamanho(m->bases[a->base].fila_espera) != 0)
 	{
 		//verificar se é fila mesmo!!!!!!!!!!!!!!!!!!!!!!
 		lista_remove_inicio(m->bases[a->base].fila_espera, &h);
 		cjto_insere(m->bases[a->base].presentes, h);
-
-		printf("%6d: AVISA PORTEIRO BASE %d ADMITE %2d\n", a->tempo, a->base, h);
 
 		/* Cria evento entra e insere na LEF */
 		if(!(in = malloc(sizeof(struct entra))))
@@ -123,6 +138,9 @@ void evento_avisa(struct Mundo *m, struct avisa *a)
 		in->base = a->base;
 
 		fprio_insere(m->LEF, in, ENTRA, in->tempo);
+
+		printf("%6d: AVISA PORTEIRO BASE %d ADMITE %2d\n",
+				a->tempo, a->base, h);
 	}
 }
 
@@ -133,8 +151,6 @@ void evento_entra(struct Mundo *m, struct entra *in)
 	struct sai *s;
 	int TPB = 15 + m->herois[in->heroi].paciencia * (1 + rand() % 20); //1 a 20
 
-	m->herois[in->heroi].base = in->base; /* Atualiza estrutura do herói */
-
 	/* Cria evento sai e insere na LEF */
 	if(!(s = malloc(sizeof(struct entra))))
 		return;
@@ -144,9 +160,9 @@ void evento_entra(struct Mundo *m, struct entra *in)
 
 	fprio_insere(m->LEF, s, SAI, s->tempo);
 
-	//vão todos no final então?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-	printf("%6d: ENTRA HEROI %2d BASE %d (%2d/%2d) SAI %d\n", in->tempo, in->heroi, in->base,
-			lista_tamanho(m->bases[in->base].fila_espera), m->bases[in->base].lotacao, s->tempo);
+	printf("%6d: ENTRA HEROI %2d BASE %d (%2d/%2d) SAI %d\n",
+		in->tempo, in->heroi, in->base, lista_tamanho(m->bases[in->base].fila_espera),
+		m->bases[in->base].lotacao, s->tempo);
 }
 
 /*O herói H sai da base B. Ao sair, escolhe uma base de destino para viajar; o
@@ -180,8 +196,8 @@ void evento_sai(struct Mundo *m, struct sai *s)
 
 	fprio_insere(m->LEF, a, AVISA, a->tempo);
 
-	printf("%6d: SAI HEROI %2d BASE %d (%2d/%2d)\n", s->tempo, s->heroi, s->base,
-			m->bases[s->base].presentes->num, m->bases[s->base].lotacao);
+	printf("%6d: SAI HEROI %2d BASE %d (%2d/%2d)\n",
+			s->tempo, s->heroi, s->base, m->bases[s->base].presentes->num, m->bases[s->base].lotacao);
 }
 
 //qual o sentido disso?????!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
@@ -192,6 +208,7 @@ void evento_viaja(struct Mundo *m, struct viaja *v)
 	int distancia, duracao;
 
 	/* Cálculo da distância e da duração */
+	//modular distância??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	distancia = sqrt((m->herois[v->heroi].base)*(m->herois[v->heroi].base) + (v->destino)*(v->destino));
 
 	duracao = distancia / m->herois[v->heroi].velocidade;
@@ -205,12 +222,12 @@ void evento_viaja(struct Mundo *m, struct viaja *v)
 
 	fprio_insere(m->LEF, c, CHEGA, c->tempo);
 
-	//não sei se tá bom esse acesso a base antiga!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
 	printf("%6d: VIAJA HEROI %2d BASE %d BASE %d DIST %d VEL %d CHEGA %d\n",
 			v->tempo, v->heroi, m->herois[v->heroi].base, v->destino, 
 			distancia, m->herois[v->heroi].velocidade, c->tempo);
 }
 
+//Decrementar número de heróis!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 /*O herói H morre no instante T.*/
 void evento_morre(struct Mundo *m, struct morre *mo)
 {
@@ -230,4 +247,3 @@ void evento_morre(struct Mundo *m, struct morre *mo)
 
 	printf("%6d: MORRE HEROI %2d MISSAO %d\n", mo->tempo, mo->heroi, 0);
 }
-

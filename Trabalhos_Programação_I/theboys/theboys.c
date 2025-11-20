@@ -25,7 +25,7 @@ int main ()
 	srand(0);
 
 	mundo.relogio = 0;
-	mundo.tam_mundo.x = TAMMUNDO; //verificar se é isso mesmo!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	mundo.tam_mundo.x = TAMMUNDO;
 	mundo.tam_mundo.y = TAMMUNDO;
 	mundo.nhabilidades = NHABILIDADES;
 	mundo.nherois = NHEROIS;
@@ -94,7 +94,7 @@ int main ()
 		c->base = rand() % mundo.nbases; //0 a NBASES-1 verificar se tá certo!!!!!!!!!!
 		c->tempo = rand() % 4321; //0 a 4320
 
-		fprio_insere(mundo.LEF, c, CHEGA, c->tempo); //verificar se é isso!!!!!!!!!!!!!!!!!!!!!
+		fprio_insere(mundo.LEF, c, CHEGA, c->tempo);
 	}
 /*
 	/ Cada missão irá ocorrer em algum momento /
