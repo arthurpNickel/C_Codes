@@ -69,6 +69,7 @@ struct Missao
 	int id;
 	struct cjto_t *habilidades_m; //conjunto de habilidades necessárias
 	struct Coord local;
+	int tempo; //Não tenho certeza disso!!!!!!!!!!!!!!!!!!
 } ;
 
 struct Mundo 
@@ -141,12 +142,6 @@ struct morre
 	int base;
 } ;
 
-struct missao
-{
-	int tempo;
-	int missao; //isso mesmo?!!!!!!!!!!!!!!!!!!!!!!!
-} ;
-
 struct fim
 {
     int tempo;
@@ -181,7 +176,8 @@ void evento_viaja(struct Mundo *m, struct viaja *v);
 /*O herói H morre no instante T.*/
 void evento_morre(struct Mundo *m, struct morre *mo);
 
-//evento missão
+/*Uma missão M é disparada no instante T*/
+void evento_missao(struct Mundo *m, struct Missao *M);
 
 //evento fim
 

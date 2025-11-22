@@ -34,6 +34,8 @@ int main ()
 	mundo.ncompostos = NCOMPOSTOS;
 	mundo.LEF = fprio_cria(); /* LEF é uma fila de prioridade, com prioridade = tempo */
 
+	//usar cjto_aleat???!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 	/* Inicialização dos heróis */
 	for (int i = 0; i < mundo.nherois; i++)
 	{
@@ -96,14 +98,14 @@ int main ()
 
 		fprio_insere(mundo.LEF, c, CHEGA, c->tempo);
 	}
-/*
-	/ Cada missão irá ocorrer em algum momento /
+
+	/* Distribuição das missões na LEF */
 	for (int i = 0; i < mundo.nmissoes; i++)
 	{
-		t = rand() % ...;
-		fprio_insere(evento_missao(t, mundo.missoes[i].id)); //ver se é assim !!!!!!!!!!!!!
+		mundo.missoes[i].tempo = rand() % (FIMMUNDO + 1);
+		fprio_insere(mundo.LEF, &mundo.missoes[i], MISSAO, mundo.missoes[i].tempo);
 	}
-*/
+
 
 	/* Evento que finalizará a mundo */
 	struct fim *f;
@@ -150,6 +152,10 @@ int main ()
 
 			case MORRE:
 				evento_morre(&mundo, evento_atual);
+				break;
+
+			case MISSAO:
+				evento_missao(&mundo, evento_atual);
 				break;
 
 			case FIM:

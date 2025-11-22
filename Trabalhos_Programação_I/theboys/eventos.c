@@ -209,7 +209,8 @@ void evento_viaja(struct Mundo *m, struct viaja *v)
 
 	/* Cálculo da distância e da duração */
 	//modular distância??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	distancia = sqrt((m->herois[v->heroi].base)*(m->herois[v->heroi].base) + (v->destino)*(v->destino));
+	//Ta errado esse cálculo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	distancia = sqrt(pow(m->herois[v->heroi].base, 2) + pow(v->destino, 2));
 
 	duracao = distancia / m->herois[v->heroi].velocidade;
 
@@ -246,4 +247,35 @@ void evento_morre(struct Mundo *m, struct morre *mo)
 	fprio_insere(m->LEF, a, AVISA, a->tempo);
 
 	printf("%6d: MORRE HEROI %2d MISSAO %d\n", mo->tempo, mo->heroi, 0);
+}
+
+/*Uma missão M é disparada no instante T*/
+void evento_missao(struct Mundo *m, struct Missao *M) //Manter esse m maiusculo????!!!!!!!!!!!!!!
+{
+	struct fprio_t *distancia_bases;
+	struct cjto_t *habilidades_base;
+	int i, distancia, BMP, b, primeira, id; //!!
+	void *primeira, *base; //!!
+
+	/* Calcula a distância de cada base ao local da missão e insere em uma fila, ordenada pela distancia */
+	for (i = 0; i < m->nbases; i++)
+	{
+		//modular distância??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		distancia = sqrt(pow(m->bases[i].local.x - M->local.x, 2) + pow(m->bases[i].local.y - M->local.y, 2));		
+		fprio_insere(distancia_bases, &m->bases[i], i, distancia);
+	}
+
+	/* Guarda base mais próxima - Caso precise usar composto V*/
+	primeira = fprio_retira(distancia_bases, &id ,&distancia); //isso é gambiarra??!!!!!!!!!!!!!!1
+	fprio_insere(distancia_bases, &m->bases[primeira], id, distancia);
+
+	/* Verifica se existe alguma base com todas as habilidades necessárias para a missão */
+	lista_inicia_iterador(distancia_bases);
+	while (lista_incrementa_iterador(distancia_bases, &b))
+	{
+		base = fprio_retira(distancia_bases, &id, &distancia);
+		
+		//Como acesso todos os heróis da base para unir habilidades??!!!!!!!!!!!!!!!!!!!!!!
+
+	}
 }
