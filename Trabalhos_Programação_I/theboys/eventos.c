@@ -269,6 +269,9 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Manter esse m maiusculo?
 	primeira = fprio_retira(distancia_bases, &id ,&distancia); //isso é gambiarra??!!!!!!!!!!!!!!1
 	fprio_insere(distancia_bases, &m->bases[primeira], id, distancia);
 
+	//testar se base tem herói???!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//add na fila apenas as que tem herói
+
 	/* Verifica se existe alguma base com todas as habilidades necessárias para a missão */
 	lista_inicia_iterador(distancia_bases);
 	while (lista_incrementa_iterador(distancia_bases, &b))
