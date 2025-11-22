@@ -2,6 +2,13 @@
 
 #include "eventos.h"
 
+int heroi_morto(struct Mundo *m, int heroi)
+{
+	if (cjto_pertence(m->vivos, heroi))
+		return 0;
+	return 1;
+}
+
 /*Herói h chegando na base b no instante t. Ao chegar, o
 herói analisa o tamanho da fila e decide se espera para entrar ou desiste*/
 void evento_chega(struct Mundo *m, struct chega *c)
@@ -10,14 +17,17 @@ void evento_chega(struct Mundo *m, struct chega *c)
 	struct espera *e;
 	struct desiste *d;
 
+	if (heroi_morto(m, c->heroi))
+		return;
+
 	m->herois[c->heroi].base = c->base; /* Muda ID da base que herói se encontra no momento*/
 
-	if (lista_tamanho(m->bases[c->base].fila_espera) < m->bases[c->base].lotacao && //precisa dessa primeira verificação???!!!!!!!!!!!!!!!!!!!!!!
-		lista_tamanho(m->bases[c->base].fila_espera) == 0)
+	if (fila_tamanho(m->bases[c->base].fila_espera) < m->bases[c->base].lotacao && //precisa dessa primeira verificação???!!!!!!!!!!!!!!!!!!!!!!
+		fila_tamanho(m->bases[c->base].fila_espera) == 0)
 		espera = 1;
 
 	else //return? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		espera =  m->herois[c->heroi].paciencia > 10 * lista_tamanho(m->bases[c->base].fila_espera);
+		espera =  m->herois[c->heroi].paciencia > 10 * fila_tamanho(m->bases[c->base].fila_espera);
     
     if (espera)
     {
@@ -48,7 +58,7 @@ void evento_chega(struct Mundo *m, struct chega *c)
 	fprio_insere(m->LEF, d, DESISTE, d->tempo);
 
 	printf("%6d: CHEGA HEROI %2d BASE %d (%2d/%2d) ",
-		c->tempo, c->heroi, c->base, lista_tamanho(m->bases[c->base].fila_espera), m->bases[c->base].lotacao);
+		c->tempo, c->heroi, c->base, fila_tamanho(m->bases[c->base].fila_espera), m->bases[c->base].lotacao);
 }
 
 /* O herói H entra na fila de espera da base B. Assim que H entrar na fila, o
@@ -56,9 +66,11 @@ porteiro da base B deve ser avisado para verificar a fila: */
 void evento_espera(struct Mundo *m, struct espera *e)
 {
 	struct avisa *a;
+
+	if (heroi_morto(m, e->heroi))
+		return;
 	
-	//verificar se é fila ou lista!!!!!!!!!!!!!!!!!!!!!!!!
-	lista_insere_fim(m->bases[e->base].fila_espera, e->heroi); //algum caso de erro???!!!!!!!!
+	fila_insere(m->bases[e->base].fila_espera, e->heroi); //algum caso de erro???!!!!!!!!
 
 	/* Cria evento avisa e insere na LEF */
 	if (!(a = malloc(sizeof(struct avisa))))
@@ -69,7 +81,7 @@ void evento_espera(struct Mundo *m, struct espera *e)
 	fprio_insere(m->LEF, a, AVISA, a->tempo);
 
 	printf("%6d: ESPERA HEROI %2d BASE %d (%2d)\n",
-			e->tempo, e->heroi, e->base, lista_tamanho(m->bases[e->base].fila_espera));
+			e->tempo, e->heroi, e->base, fila_tamanho(m->bases[e->base].fila_espera));
 }
 
 /*O herói H desiste de entrar na base B, escolhe uma base aleatória D e viaja
@@ -78,6 +90,9 @@ void evento_desiste(struct Mundo *m, struct espera *d)
 {
 	struct viaja *v;
 	int destino; //precisa?!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	if (heroi_morto(m, d->heroi))
+		return;
 
 	destino = rand() % m->nbases; /* Escolhe uma base aleatória */
 
@@ -101,33 +116,19 @@ void evento_avisa(struct Mundo *m, struct avisa *a)
 	struct entra *in;
 	int h;
 	
+	//arrumar aqui
 	printf("%6d: AVISA PORTEIRO BASE %d (%2d/%2d) FILA [ ", 
-			a->tempo, a->base, lista_tamanho(m->bases[a->base].fila_espera), m->bases[a->base].lotacao);
+			a->tempo, a->base, fila_tamanho(m->bases[a->base].fila_espera), m->bases[a->base].lotacao);
 			//FILA [ %2d %2d  ]"
 	
-	//modular?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	/*------------Impressão da fila de espera-------------*/
-	if (lista_vazia(m->bases[a->base].fila_espera))
-	{
-		printf ("]\n");
-		return;
-	}
-	
-	lista_inicia_iterador(m->bases[a->base].fila_espera);
-
-	lista_incrementa_iterador (m->bases[a->base].fila_espera, &h);
-	printf ("%d", h);
-	while (lista_incrementa_iterador(m->bases[a->base].fila_espera, &h))
-		printf (" %d", h);
+	fila_imprime(m->bases[a->base].fila_espera); //verificar se deu boa!!!!!!!!!!!!!!!!!!!!!!!!!!
 	printf (" ]\n");
-	/*----------------------------------------------------*/
 
 	//m->bases[a->base].lotacao ou m->bases[a->base].presentes->cap???!!!!!!!!!!!!!!!!!!!!!!!
 	while (m->bases[a->base].lotacao > m->bases[a->base].presentes->num 
-			&& lista_tamanho(m->bases[a->base].fila_espera) != 0)
+			&& fila_tamanho(m->bases[a->base].fila_espera) != 0)
 	{
-		//verificar se é fila mesmo!!!!!!!!!!!!!!!!!!!!!!
-		lista_remove_inicio(m->bases[a->base].fila_espera, &h);
+		fila_retira(m->bases[a->base].fila_espera, &h);
 		cjto_insere(m->bases[a->base].presentes, h);
 
 		/* Cria evento entra e insere na LEF */
@@ -149,7 +150,12 @@ agenda sua saída da base*/
 void evento_entra(struct Mundo *m, struct entra *in)
 {
 	struct sai *s;
-	int TPB = 15 + m->herois[in->heroi].paciencia * (1 + rand() % 20); //1 a 20
+	int TPB;
+
+	if (heroi_morto(m, in->heroi))
+		return;
+
+	TPB = 15 + m->herois[in->heroi].paciencia * (1 + rand() % 20); //1 a 20
 
 	/* Cria evento sai e insere na LEF */
 	if(!(s = malloc(sizeof(struct entra))))
@@ -161,7 +167,7 @@ void evento_entra(struct Mundo *m, struct entra *in)
 	fprio_insere(m->LEF, s, SAI, s->tempo);
 
 	printf("%6d: ENTRA HEROI %2d BASE %d (%2d/%2d) SAI %d\n",
-		in->tempo, in->heroi, in->base, lista_tamanho(m->bases[in->base].fila_espera),
+		in->tempo, in->heroi, in->base, fila_tamanho(m->bases[in->base].fila_espera),
 		m->bases[in->base].lotacao, s->tempo);
 }
 
@@ -172,6 +178,9 @@ void evento_sai(struct Mundo *m, struct sai *s)
 	struct viaja *v;
 	struct avisa *a;
 	int destino, status;
+
+	if (heroi_morto(m, s->heroi))
+		return;
 
 	status = cjto_retira(m->bases[s->base].presentes, s->heroi);
 
@@ -207,6 +216,9 @@ void evento_viaja(struct Mundo *m, struct viaja *v)
 	struct chega *c;
 	int distancia, duracao;
 
+	if (heroi_morto(m, v->heroi))
+		return;
+
 	/* Cálculo da distância e da duração */
 	//modular distância??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//Ta errado esse cálculo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -234,6 +246,9 @@ void evento_morre(struct Mundo *m, struct morre *mo)
 {
 	struct avisa *a;
 
+	if (heroi_morto(m, mo->heroi)) //será??!!!!!!!!!!!!!!!!!!!!!
+		return;
+
 	cjto_retira(m->bases[mo->base].presentes, mo->heroi); /* Retira herói da base em que se encontra */
 
 	//Como mudo status do herói??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -254,31 +269,95 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Manter esse m maiusculo?
 {
 	struct fprio_t *distancia_bases;
 	struct cjto_t *habilidades_base;
-	int i, distancia, BMP, b, primeira, id; //!!
+	struct morre *mo;
+	int i, distancia, BMP, b, primeira, id, escolhido, xp_atual; //!!
 	void *primeira, *base; //!!
+
+	distancia_bases = fprio_cria();
 
 	/* Calcula a distância de cada base ao local da missão e insere em uma fila, ordenada pela distancia */
 	for (i = 0; i < m->nbases; i++)
 	{
 		//modular distância??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		distancia = sqrt(pow(m->bases[i].local.x - M->local.x, 2) + pow(m->bases[i].local.y - M->local.y, 2));		
-		fprio_insere(distancia_bases, &m->bases[i], i, distancia);
+		distancia = sqrt(pow(m->bases[i].local.x - M->local.x, 2) + pow(m->bases[i].local.y - M->local.y, 2));
+		if (cjto_card(m->bases[i].presentes) != 0)	
+			fprio_insere(distancia_bases, &m->bases[i], i, distancia);
 	}
 
 	/* Guarda base mais próxima - Caso precise usar composto V*/
 	primeira = fprio_retira(distancia_bases, &id ,&distancia); //isso é gambiarra??!!!!!!!!!!!!!!1
 	fprio_insere(distancia_bases, &m->bases[primeira], id, distancia);
 
-	//testar se base tem herói???!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//add na fila apenas as que tem herói
+	BMP = 0; /* "Base mais próxima com heróis capazes" <- Falso */
 
 	/* Verifica se existe alguma base com todas as habilidades necessárias para a missão */
-	lista_inicia_iterador(distancia_bases);
-	while (lista_incrementa_iterador(distancia_bases, &b))
+	while (!BMP && fprio_tamanho(distancia_bases) > 0)
 	{
 		base = fprio_retira(distancia_bases, &id, &distancia);
-		
-		//Como acesso todos os heróis da base para unir habilidades??!!!!!!!!!!!!!!!!!!!!!!
 
+		/* Criação do conjunto de habilidades da base retirada*/
+		habilidades_base = cjto_cria(NHABILIDADES);		
+		for (i = 0; i < m->nherois; i++) //Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
+		{
+			/* Se o herói pertecente a base, então suas habilidades são unidas as da base*/
+			if (cjto_pertence(m->bases[id].presentes, i))
+				habilidades_base = cjto_uniao(habilidades_base, m->herois[id].habilidades);
+		}
+
+		/* Verifica se as habilidades da missão estão contidas no conjunto de habilidades da base*/
+		if (cjto_contem(habilidades_base, M->habilidades_m) == 1)
+			BMP = 1; /* Base é marcada como BMP (o id dela está na variável id) */
+
+		cjto_destroi(habilidades_base);
 	}
+
+	/* Se existe base cujos heróis conseguem cumprir a missão: */
+	if (BMP)
+	{
+		//marcar missão como cumprida?!!!!!!!!!!!!!!!!!!!
+
+		for (i = 0; i < m->nherois; i++) //Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
+		{
+			/* Se o herói pertecente a base, então sua experiência aumenta*/
+			if (cjto_pertence(m->bases[id].presentes, i))
+				m->herois[i].xp++;
+		}
+
+		return;
+	}
+
+	/* Se não, verifica se é possível usar composto V*/
+	if (m->ncompostos != 0 && M->tempo % 2500 == 0)
+	{
+		m->ncompostos--;
+
+		//marcar missão como cumprida?!!!!!!!!!!!!!!!!!!!
+
+		/* Procura herói mais experiente da base mais próxima */
+		xp_atual = -1;	/* Variável para buscar maior xp */
+		for (i = 0; i < m->nherois; i++) //Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
+		{
+			/* Se o herói pertecente a base e tem xp maior que o atual escolhido, então ele passa a ser o escolhido*/
+			if (cjto_pertence(m->bases[primeira].presentes, i) && m->herois[i].xp > xp_atual)
+			{
+				xp_atual = m->herois[i].xp;
+				escolhido = i;
+			}
+		}
+
+		/* Cria evento morre e insere na LEF */
+		if (!(mo = malloc(sizeof(struct morre))))
+			return;
+		mo->tempo = M->tempo;
+		mo->base = m->herois[escolhido].base;
+		mo->heroi = escolhido;
+
+		fprio_insere(m->LEF, mo, MORRE, mo->tempo);
+		
+		return;
+	}
+
+	/* Se não, adia missão por 1 dia*/
+	M->tempo = M->tempo + 1440;
+	fprio_insere(m->LEF, M, MISSAO, M->tempo);
 }

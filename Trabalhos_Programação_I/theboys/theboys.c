@@ -37,12 +37,15 @@ int main ()
 	//usar cjto_aleat???!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	/* Inicialização dos heróis */
+	mundo.vivos = cjto_cria(mundo.nherois);
 	for (int i = 0; i < mundo.nherois; i++)
 	{
 		mundo.herois[i].id = i;
 		mundo.herois[i].xp = 0;
 		mundo.herois[i].paciencia = rand() % 101; //0 a 100
 		mundo.herois[i].velocidade = 50 + rand() % 4951; //50 a 5000
+
+		cjto_insere(mundo.vivos, i);
 
 		/* Heroi terá uma quantidade aleatória de habilidadades, também aleatórias */
 		mundo.herois[i].habilidades = cjto_cria(1 + rand() % 4); //1 a 3
@@ -63,8 +66,7 @@ int main ()
 	
 		mundo.bases[i].presentes = cjto_cria(mundo.bases[i].lotacao);
 
-		//verificar se é fila ou lista!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		mundo.bases[i].fila_espera = lista_cria();
+		mundo.bases[i].fila_espera = fila_cria();
 	}
 
 	/* Inicialização das missões */
@@ -119,6 +121,8 @@ int main ()
 	do {
 		/* Evento atual aponta para a struct do próximo evento */
 		evento_atual = fprio_retira(mundo.LEF, &codigo_evento, &tempo);
+
+		mundo.relogio = tempo;
 
 		switch (codigo_evento) /* Escolhe o próximo evento a ser realizado na simulação de acordo com o código*/
 		{
@@ -181,9 +185,10 @@ int main ()
 	for (int i = 0; i < mundo.nbases; i++)
 	{
 		cjto_destroi(mundo.bases[i].presentes);
-		//verificar se é fila ou lista!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		lista_destroi(&mundo.bases[i].fila_espera);
+		mundo.bases[i].fila_espera = (mundo.bases[i].fila_espera);
 	}
+
+	cjto_destroi(mundo.vivos);
 
 	/* Destruição do conjunto de habilidade de todas as missões*/
 	for (int i = 0; i < mundo.nmissoes; i++)

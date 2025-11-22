@@ -59,7 +59,7 @@ struct Base
 	struct cjto_t *presentes; //conjunto de IDs dos heróis presentes na base
 
 	//verificar se é fila ou lista!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	struct lista *fila_espera; //fila de heróis esperando para entrar na base -> é uma fila normal
+	struct fila_t *fila_espera; //fila de heróis esperando para entrar na base -> é uma fila normal
 
 	struct Coord local;
 } ;
@@ -76,6 +76,7 @@ struct Mundo
 {
 	int nherois;
 	struct Heroi herois[NHEROIS]; //Número constante assim mesmo?
+	struct cjto_t *vivos; //válido??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	int nbases;
 	struct Base bases[NBASES]; //revisar isso
 	int nmissoes;

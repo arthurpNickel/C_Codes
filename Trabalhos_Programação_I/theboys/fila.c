@@ -110,17 +110,8 @@ void fila_imprime (struct fila_t *f)
 {
     struct fila_nodo_t *aux;
 
-    if (f == NULL)
-    {
-        printf("Fila Nula!\n");
+    if (f == NULL || f->num == 0)
         return;
-    }
-    
-    if (f->num == 0)
-    {
-        printf("Fila Vazia!\n");
-        return;
-    }
 
     aux = f->prim;
 
@@ -133,5 +124,5 @@ void fila_imprime (struct fila_t *f)
         }
         aux = aux->prox;
     }
-    printf("%d\n", aux->item);   
+    printf("%d", aux->item);   
 }
