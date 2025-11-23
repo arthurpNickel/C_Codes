@@ -20,6 +20,9 @@ void evento_chega(struct Mundo *m, struct chega *c)
 	if (heroi_morto(m, c->heroi))
 		return;
 
+	printf("%6d: CHEGA HEROI %2d BASE %d (%2d/%2d) ",
+	c->tempo, c->heroi, c->base, fila_tamanho(m->bases[c->base].fila_espera), m->bases[c->base].lotacao);
+
 	m->herois[c->heroi].base = c->base; /* Muda ID da base que herói se encontra no momento*/
 
 	if (fila_tamanho(m->bases[c->base].fila_espera) < m->bases[c->base].lotacao && //precisa dessa primeira verificação???!!!!!!!!!!!!!!!!!!!!!!
@@ -56,9 +59,6 @@ void evento_chega(struct Mundo *m, struct chega *c)
 	d->base = c->base;
 	
 	fprio_insere(m->LEF, d, DESISTE, d->tempo);
-
-	printf("%6d: CHEGA HEROI %2d BASE %d (%2d/%2d) ",
-		c->tempo, c->heroi, c->base, fila_tamanho(m->bases[c->base].fila_espera), m->bases[c->base].lotacao);
 }
 
 /* O herói H entra na fila de espera da base B. Assim que H entrar na fila, o
@@ -69,6 +69,9 @@ void evento_espera(struct Mundo *m, struct espera *e)
 
 	if (heroi_morto(m, e->heroi))
 		return;
+
+	printf("%6d: ESPERA HEROI %2d BASE %d (%2d)\n",
+			e->tempo, e->heroi, e->base, fila_tamanho(m->bases[e->base].fila_espera));
 	
 	fila_insere(m->bases[e->base].fila_espera, e->heroi); //algum caso de erro???!!!!!!!!
 
@@ -79,9 +82,6 @@ void evento_espera(struct Mundo *m, struct espera *e)
 	a->base = e->base;
 
 	fprio_insere(m->LEF, a, AVISA, a->tempo);
-
-	printf("%6d: ESPERA HEROI %2d BASE %d (%2d)\n",
-			e->tempo, e->heroi, e->base, fila_tamanho(m->bases[e->base].fila_espera));
 }
 
 /*O herói H desiste de entrar na base B, escolhe uma base aleatória D e viaja
@@ -264,62 +264,112 @@ void evento_morre(struct Mundo *m, struct morre *mo)
 	printf("%6d: MORRE HEROI %2d MISSAO %d\n", mo->tempo, mo->heroi, 0);
 }
 
+//verificar aterramentos
+//manipulação de ponteiro de bases e etc!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 /*Uma missão M é disparada no instante T*/
 void evento_missao(struct Mundo *m, struct Missao *M) //Manter esse m maiusculo????!!!!!!!!!!!!!!
 {
-	struct fprio_t *distancia_bases;
+	struct fprio_t *distancia_bases; //esqueci de liberar
 	struct cjto_t *habilidades_base;
 	struct morre *mo;
-	int i, distancia, BMP, b, primeira, id, escolhido, xp_atual; //!!
-	void *primeira, *base; //!!
+	struct Base *primeira_base, *base; //!!
+	int i, distancia, BMP, b, primeira_id, id_base, escolhido, xp_atual; //!!
+
+	M->tentativas++;
+
+	printf("%6d: MISSAO %d TENT %d HAB REQ: [ ", M->tempo, M->id, M->tentativas);
+	cjto_imprime(M->habilidades_m);
+	printf(" ]\n");
 
 	distancia_bases = fprio_cria();
+
+	if (distancia_bases == NULL) //?????
+		return;
 
 	/* Calcula a distância de cada base ao local da missão e insere em uma fila, ordenada pela distancia */
 	for (i = 0; i < m->nbases; i++)
 	{
+		//avaliar retorno de tipo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//modular distância??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		distancia = sqrt(pow(m->bases[i].local.x - M->local.x, 2) + pow(m->bases[i].local.y - M->local.y, 2));
+
+		printf("%6d: MISSAO %d BASE %d DIST %d HEROIS [ ", M->tempo, M->id, i, distancia);
+		cjto_imprime(m->bases[i].presentes);
+		printf(" ]\n");
+
 		if (cjto_card(m->bases[i].presentes) != 0)	
-			fprio_insere(distancia_bases, &m->bases[i], i, distancia);
+			fprio_insere(distancia_bases, &(m->bases[i]), i, distancia);
+	}
+
+	/* Se não existe nenhum herói em nenhuma base, é marcada como impossível*/
+	if (fprio_tamanho(distancia_bases) == 0)
+	{
+		fprio_destroi(distancia_bases);
+
+		/* Adia missão em 1 dia */
+		printf("%6d: MISSAO %d IMPOSSIVEL\n", M->tempo, M->id);
+		M->tempo = M->tempo + 1440;
+		fprio_insere(m->LEF, M, MISSAO, M->tempo);
+
+		return;
 	}
 
 	/* Guarda base mais próxima - Caso precise usar composto V*/
-	primeira = fprio_retira(distancia_bases, &id ,&distancia); //isso é gambiarra??!!!!!!!!!!!!!!1
-	fprio_insere(distancia_bases, &m->bases[primeira], id, distancia);
+	primeira_base = fprio_retira(distancia_bases, &id_base ,&distancia); //isso é gambiarra??!!!!!!!!!!!!!!1
+	primeira_id = id_base;
+	fprio_insere(distancia_bases, &m->bases[id_base], id_base, distancia);
 
 	BMP = 0; /* "Base mais próxima com heróis capazes" <- Falso */
 
 	/* Verifica se existe alguma base com todas as habilidades necessárias para a missão */
 	while (!BMP && fprio_tamanho(distancia_bases) > 0)
 	{
-		base = fprio_retira(distancia_bases, &id, &distancia);
+		base = fprio_retira(distancia_bases, &id_base, &distancia);
 
 		/* Criação do conjunto de habilidades da base retirada*/
 		habilidades_base = cjto_cria(NHABILIDADES);		
 		for (i = 0; i < m->nherois; i++) //Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
 		{
 			/* Se o herói pertecente a base, então suas habilidades são unidas as da base*/
-			if (cjto_pertence(m->bases[id].presentes, i))
-				habilidades_base = cjto_uniao(habilidades_base, m->herois[id].habilidades);
+			if (cjto_pertence(m->bases[id_base].presentes, i))
+			{
+				printf("%6d: MISSAO %d HAB HEROI %2d: [ ", M->tempo, M->id, i);
+				cjto_imprime(m->herois[i].habilidades);
+				printf(" ]\n");
+
+				habilidades_base = cjto_uniao(habilidades_base, m->herois[i].habilidades);
+
+				printf("%6d: MISSAO %d UNIAO HAB BASE %d: [ ", M->tempo, M->id, id_base);
+				cjto_imprime(habilidades_base);
+				printf(" ]\n");
+			}
 		}
 
 		/* Verifica se as habilidades da missão estão contidas no conjunto de habilidades da base*/
-		if (cjto_contem(habilidades_base, M->habilidades_m) == 1)
+		if (cjto_contem(habilidades_base, M->habilidades_m))
 			BMP = 1; /* Base é marcada como BMP (o id dela está na variável id) */
-
-		cjto_destroi(habilidades_base);
+		else
+			cjto_destroi(habilidades_base); //ou colocar um break no if de cima???!!!!!!!!!!!!!!!!!!!!!!!
 	}
 
+	fprio_destroi(distancia_bases);
+
 	/* Se existe base cujos heróis conseguem cumprir a missão: */
+	//id dessa base está salvo
 	if (BMP)
 	{
 		//marcar missão como cumprida?!!!!!!!!!!!!!!!!!!!
 
+		printf("%6d: MISSAO %d CUMPRIDA BASE %d HABS: [ ", M->tempo, M->id, id_base);
+		cjto_imprime(habilidades_base);
+		printf(" ]\n");
+		cjto_destroi(habilidades_base);
+
 		for (i = 0; i < m->nherois; i++) //Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
 		{
 			/* Se o herói pertecente a base, então sua experiência aumenta*/
-			if (cjto_pertence(m->bases[id].presentes, i))
+			if (cjto_pertence(m->bases[id_base].presentes, i) && !heroi_morto(m, i))
 				m->herois[i].xp++;
 		}
 
@@ -333,16 +383,39 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Manter esse m maiusculo?
 
 		//marcar missão como cumprida?!!!!!!!!!!!!!!!!!!!
 
+		/* Criação do conjunto de habilidades da base mais próxima mais as habilidades do herói com composto V*/
+		habilidades_base = cjto_cria(NHABILIDADES);		
+		for (i = 0; i < m->nherois; i++) //Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
+		{
+			/* Se o herói pertecente a base, então suas habilidades são unidas as da base*/
+			if (cjto_pertence(m->bases[primeira_id].presentes, i))
+				habilidades_base = cjto_uniao(habilidades_base, m->herois[i].habilidades);
+		}
+		habilidades_base = cjto_uniao(habilidades_base, M->habilidades_m); /* Adiciona ao conjunto de habilidades da base as habilidades da missão*/
+
+		printf("%6d: MISSAO %d CUMPRIDA BASE %d HABS: [ ", M->tempo, M->id, primeira_id);
+		cjto_imprime(habilidades_base);
+		printf(" ]\n");
+		cjto_destroi(habilidades_base);
+
 		/* Procura herói mais experiente da base mais próxima */
+		//base mais próxima tem heróis presentes
 		xp_atual = -1;	/* Variável para buscar maior xp */
 		for (i = 0; i < m->nherois; i++) //Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
 		{
 			/* Se o herói pertecente a base e tem xp maior que o atual escolhido, então ele passa a ser o escolhido*/
-			if (cjto_pertence(m->bases[primeira].presentes, i) && m->herois[i].xp > xp_atual)
+			if (cjto_pertence(m->bases[primeira_id].presentes, i) && m->herois[i].xp > xp_atual && !heroi_morto(m, i))
 			{
 				xp_atual = m->herois[i].xp;
 				escolhido = i;
 			}
+		}
+
+		for (i = 0; i < m->nherois; i++) //Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
+		{
+			/* Se o herói pertecente a base, então sua experiência aumenta*/
+			if (cjto_pertence(m->bases[primeira_id].presentes, i) && !heroi_morto(m, i))
+				m->herois[i].xp++;
 		}
 
 		/* Cria evento morre e insere na LEF */
@@ -358,6 +431,7 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Manter esse m maiusculo?
 	}
 
 	/* Se não, adia missão por 1 dia*/
+	printf("%6d: MISSAO %d IMPOSSIVEL\n", M->tempo, M->id);
 	M->tempo = M->tempo + 1440;
 	fprio_insere(m->LEF, M, MISSAO, M->tempo);
 }

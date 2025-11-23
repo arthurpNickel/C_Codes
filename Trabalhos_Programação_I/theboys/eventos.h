@@ -69,7 +69,8 @@ struct Missao
 	int id;
 	struct cjto_t *habilidades_m; //conjunto de habilidades necessárias
 	struct Coord local;
-	int tempo; //Não tenho certeza disso!!!!!!!!!!!!!!!!!!
+	int tempo; //Não tenho certeza disso!!!!!!!!!!!!!!!!!!]
+	int tentativas; //posso??!!!!!!!!!!!!!!!!!!!!!
 } ;
 
 struct Mundo 

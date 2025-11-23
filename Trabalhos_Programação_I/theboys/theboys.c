@@ -63,7 +63,7 @@ int main ()
 		mundo.bases[i].local.x = rand() % mundo.tam_mundo.x; //0 a TAMMUNDO-1
 		mundo.bases[i].local.y = rand() % mundo.tam_mundo.y; //0 a TAMMUNDO-1
 		mundo.bases[i].lotacao = 3 + rand() % 11; //3 a 10
-	
+
 		mundo.bases[i].presentes = cjto_cria(mundo.bases[i].lotacao);
 
 		mundo.bases[i].fila_espera = fila_cria();
@@ -73,6 +73,7 @@ int main ()
 	for (int i = 0; i < mundo.nmissoes; i++)
 	{
 		mundo.missoes[i].id = i;
+		mundo.missoes[i].tentativas = 0;
 		mundo.missoes[i].local.x = rand() % mundo.tam_mundo.x; //0 a TAMMUNDO-1
 		mundo.missoes[i].local.y = rand() % mundo.tam_mundo.y; //0 a TAMMUNDO-1
 
