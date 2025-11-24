@@ -1,3 +1,13 @@
+//TO DO:
+//Mudar todo o vetor de missões para estrutura dinâmica
+
+//QUESTION:
+//Precisa liberar todo evento depois do switch case? fprio já libera item!!!
+//Avalio retorno de eventos com casos de erro?
+//O que vou modular e o que não?
+//Usar time NULL no programa final?
+//Usar cjto_aleat em inicializações?
+
 // programa principal do projeto "The Boys - 2024/2"
 // Autor: Arthur Paul Nickel, GRR 20252825
 
@@ -14,19 +24,16 @@
 
 // minimize o uso de variáveis globais
 
-
-// AVALIAR RETORNOS DE ERRO!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
 // programa principal
 int main ()
 {
-	/* Iniciar entidades e atributos -> modular? */
+	/* Iniciar entidades e atributos -> Q: modular? */
 	struct Mundo mundo;
-	int codigo_evento, tempo, hab;
+	int codigo_evento, tempo, hab; 
+	int b, t; /* Variáveis de suporte */
 	void *evento_atual;
 
-	srand(0); //Usar time NULL depois?
+	srand(0); //Q:Usar time NULL depois?
 
 	mundo.relogio = 0;
 	mundo.tam_mundo.x = TAMMUNDO;
@@ -38,7 +45,7 @@ int main ()
 	mundo.ncompostos = NCOMPOSTOS;
 	mundo.LEF = fprio_cria(); /* LEF é uma fila de prioridade, com prioridade = tempo */
 
-	//usar cjto_aleat???!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//Q: usar cjto_aleat???!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	/* Inicialização dos heróis */
 	mundo.vivos = cjto_cria(mundo.nherois);
@@ -56,7 +63,7 @@ int main ()
 		for (int j = 0; j < mundo.herois[i].habilidades->cap; j++)
 		{
 			hab = 1 + rand() % mundo.nhabilidades; //1 a NHABILIDADES
-			cjto_insere(mundo.herois[i].habilidades, hab); //verificar se é assim mesmo!!!!!!!!!!!!!!!
+			cjto_insere(mundo.herois[i].habilidades, hab);
 		}
 	}
 
@@ -94,16 +101,9 @@ int main ()
 	/* Cada herói chegará em alguma base dentro de 3 dias */
 	for (int i = 0; i < mundo.nherois; i++)
 	{
-		/* Cria o evento */
-		struct chega *c;
-    	if (!(c = malloc(sizeof(struct chega))))
-        	return 1;
-		
-		c->heroi = i;
-		c->base = rand() % mundo.nbases; //0 a NBASES-1 verificar se tá certo!!!!!!!!!!
-		c->tempo = rand() % 4321; //0 a 4320
-
-		fprio_insere(mundo.LEF, c, CHEGA, c->tempo);
+		b = rand() % mundo.nbases;
+		t = rand() % 4321; //0 a 4320
+		cria_evento_chega(&mundo, i, b, t);
 	}
 
 	/* Distribuição das missões na LEF */
@@ -117,7 +117,7 @@ int main ()
 	/* Evento que finalizará a mundo */
 	struct fim *f;
 	if (!(f = malloc(sizeof(struct fim))))
-		return 1; //return o que?!!!!!!!!!!!!!!!!!!!!!!!!!
+		return 1; //Q: return o que?!!!!!!!!!!!!!!!!!!!!!!!!!
 	f->tempo = FIMMUNDO;
 
 	fprio_insere(mundo.LEF, f, FIM, FIMMUNDO);
@@ -175,7 +175,7 @@ int main ()
 				break;
 		}
 
-		//CPA NÃO PRECISE -> FPRIO DESTRÓI ITENS TAMBÉM
+		//Q: CPA NÃO PRECISE -> FPRIO DESTRÓI ITENS TAMBÉM
 		if (codigo_evento != MISSAO) /* Missão é a única estrutura estática (mundo.missoes[i]) */
 			free(evento_atual);
 
