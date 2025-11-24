@@ -25,8 +25,8 @@
 //Tirar daqui depois tudo isso!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 // seus #defines vão aqui
-#define NHABILIDADES 10
-#define FIMMUNDO 525600
+#define NHABILIDADES 5 //original: 10
+#define FIMMUNDO 52560 //original: 525600
 #define NHEROIS NHABILIDADES * 5
 #define NBASES NHEROIS / 5
 #define NMISSOES FIMMUNDO / 100
@@ -77,6 +77,7 @@ struct Mundo
 {
 	int nherois;
 	struct Heroi herois[NHEROIS]; //Número constante assim mesmo?
+	//acho que tirar isso
 	struct cjto_t *vivos; //válido??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	int nbases;
 	struct Base bases[NBASES]; //revisar isso

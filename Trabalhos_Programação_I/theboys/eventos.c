@@ -125,7 +125,7 @@ void evento_avisa(struct Mundo *m, struct avisa *a)
 	printf (" ]\n");
 
 	//m->bases[a->base].lotacao ou m->bases[a->base].presentes->cap???!!!!!!!!!!!!!!!!!!!!!!!
-	while (m->bases[a->base].lotacao > m->bases[a->base].presentes->num 
+	while (m->bases[a->base].lotacao > cjto_card(m->bases[a->base].presentes) 
 			&& fila_tamanho(m->bases[a->base].fila_espera) != 0)
 	{
 		fila_retira(m->bases[a->base].fila_espera, &h);
@@ -158,7 +158,7 @@ void evento_entra(struct Mundo *m, struct entra *in)
 	TPB = 15 + m->herois[in->heroi].paciencia * (1 + rand() % 20); //1 a 20
 
 	/* Cria evento sai e insere na LEF */
-	if(!(s = malloc(sizeof(struct entra))))
+	if(!(s = malloc(sizeof(struct sai))))
 		return;
 	s->tempo = in->tempo + TPB;
 	s->heroi = in->heroi;
@@ -167,7 +167,7 @@ void evento_entra(struct Mundo *m, struct entra *in)
 	fprio_insere(m->LEF, s, SAI, s->tempo);
 
 	printf("%6d: ENTRA HEROI %2d BASE %d (%2d/%2d) SAI %d\n",
-		in->tempo, in->heroi, in->base, fila_tamanho(m->bases[in->base].fila_espera),
+		in->tempo, in->heroi, in->base, cjto_card(m->bases[in->base].presentes), //ver se errei isso em outro lugar!!!!!!!!!!!!!!!
 		m->bases[in->base].lotacao, s->tempo);
 }
 
@@ -206,7 +206,7 @@ void evento_sai(struct Mundo *m, struct sai *s)
 	fprio_insere(m->LEF, a, AVISA, a->tempo);
 
 	printf("%6d: SAI HEROI %2d BASE %d (%2d/%2d)\n",
-			s->tempo, s->heroi, s->base, m->bases[s->base].presentes->num, m->bases[s->base].lotacao);
+			s->tempo, s->heroi, s->base, cjto_card(m->bases[s->base].presentes), m->bases[s->base].lotacao);
 }
 
 //qual o sentido disso?????!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
@@ -221,10 +221,10 @@ void evento_viaja(struct Mundo *m, struct viaja *v)
 
 	/* Cálculo da distância e da duração */
 	//modular distância??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//Ta errado esse cálculo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	distancia = sqrt(pow(m->herois[v->heroi].base, 2) + pow(v->destino, 2));
+	distancia = (int) sqrt((double)(pow((m->bases[v->destino].local.x - m->bases[m->herois[v->heroi].base].local.x), 2)
+	 						+ pow((m->bases[v->destino].local.y - m->bases[m->herois[v->heroi].base].local.y), 2)));
 
-	duracao = distancia / m->herois[v->heroi].velocidade;
+	duracao = distancia / m->herois[v->heroi].velocidade; //arredondar para cima?? -> viagens instantâneas
 
 	/* Cria evento chega e insere na LEF */
 	if(!(c = malloc(sizeof(struct chega))))
@@ -252,6 +252,8 @@ void evento_morre(struct Mundo *m, struct morre *mo)
 	cjto_retira(m->bases[mo->base].presentes, mo->heroi); /* Retira herói da base em que se encontra */
 
 	//Como mudo status do herói??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//por enquanto assim:
+	cjto_retira(m->vivos, mo->heroi);
 
 	/* Cria evento avisa e insere na LEF */
 	if (!(a = malloc(sizeof(struct avisa))))
@@ -298,8 +300,8 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Manter esse m maiusculo?
 		cjto_imprime(m->bases[i].presentes);
 		printf(" ]\n");
 
-		if (cjto_card(m->bases[i].presentes) != 0)	
-			fprio_insere(distancia_bases, &(m->bases[i]), i, distancia);
+		if (cjto_card(m->bases[i].presentes) != 0)	//NÃO POSSO INSERIR ALGO ESTÁTICO -> DÁ RUIM NO DESTRÓI
+			fprio_insere(distancia_bases, &(m->bases[i]), i, distancia); //A MERDA ESTÁ TODA AQUI!!!!!!!!!!!!!
 	}
 
 	/* Se não existe nenhum herói em nenhuma base, é marcada como impossível*/

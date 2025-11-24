@@ -14,6 +14,10 @@
 
 // minimize o uso de variáveis globais
 
+
+// AVALIAR RETORNOS DE ERRO!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 // programa principal
 int main ()
 {
@@ -22,7 +26,7 @@ int main ()
 	int codigo_evento, tempo, hab;
 	void *evento_atual;
 
-	srand(0);
+	srand(0); //Usar time NULL depois?
 
 	mundo.relogio = 0;
 	mundo.tam_mundo.x = TAMMUNDO;
@@ -171,7 +175,9 @@ int main ()
 				break;
 		}
 
-		free(evento_atual);
+		//CPA NÃO PRECISE -> FPRIO DESTRÓI ITENS TAMBÉM
+		if (codigo_evento != MISSAO) /* Missão é a única estrutura estática (mundo.missoes[i]) */
+			free(evento_atual);
 
 	} while (codigo_evento != FIM);
 
@@ -186,7 +192,7 @@ int main ()
 	for (int i = 0; i < mundo.nbases; i++)
 	{
 		cjto_destroi(mundo.bases[i].presentes);
-		mundo.bases[i].fila_espera = (mundo.bases[i].fila_espera);
+		mundo.bases[i].fila_espera = fila_destroi(mundo.bases[i].fila_espera);
 	}
 
 	cjto_destroi(mundo.vivos);
