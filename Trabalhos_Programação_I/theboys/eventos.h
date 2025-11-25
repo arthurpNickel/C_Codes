@@ -64,6 +64,7 @@ struct Base
 	struct Coord local;
 } ;
 
+
 struct Missao 
 {
 	int id;
@@ -71,6 +72,7 @@ struct Missao
 	struct Coord local;
 	int tempo; //Não tenho certeza disso!!!!!!!!!!!!!!!!!!]
 	int tentativas; //posso??!!!!!!!!!!!!!!!!!!!!!
+
 } ;
 
 struct Mundo 
@@ -82,7 +84,7 @@ struct Mundo
 	int nbases;
 	struct Base bases[NBASES]; //revisar isso
 	int nmissoes;
-	struct Missao missoes[NMISSOES]; //revisar isso
+	struct Missao *missoes; //revisar isso
 	int nhabilidades;
 	int ncompostos; //Compostos V!!!!!!!!!!
 	struct Coord tam_mundo;

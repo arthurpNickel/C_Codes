@@ -1,5 +1,6 @@
 //TO DO:
 //Mudar todo o vetor de missões para estrutura dinâmica
+//Não fazer código de erro
 
 //QUESTION:
 //Precisa liberar todo evento depois do switch case? fprio já libera item!!!
@@ -45,6 +46,9 @@ int main ()
 	mundo.ncompostos = NCOMPOSTOS;
 	mundo.LEF = fprio_cria(); /* LEF é uma fila de prioridade, com prioridade = tempo */
 
+	if(!(mundo.missoes = malloc(sizeof(struct Missao) * mundo.nmissoes))) /*Missões tem estrutura dinâmica*/
+		return 1;
+
 	//Q: usar cjto_aleat???!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	/* Inicialização dos heróis */
@@ -83,7 +87,7 @@ int main ()
 	/* Inicialização das missões */
 	for (int i = 0; i < mundo.nmissoes; i++)
 	{
-		mundo.missoes[i].id = i;
+		mundo.missoes[i].id = i; //Vai ser ponto ou ->?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		mundo.missoes[i].tentativas = 0;
 		mundo.missoes[i].local.x = rand() % mundo.tam_mundo.x; //0 a TAMMUNDO-1
 		mundo.missoes[i].local.y = rand() % mundo.tam_mundo.y; //0 a TAMMUNDO-1
@@ -176,8 +180,10 @@ int main ()
 		}
 
 		//Q: CPA NÃO PRECISE -> FPRIO DESTRÓI ITENS TAMBÉM
-		if (codigo_evento != MISSAO) /* Missão é a única estrutura estática (mundo.missoes[i]) */
+		/*
+		if (codigo_evento != MISSAO) / Missão é a única estrutura estática (mundo.missoes[i]) /
 			free(evento_atual);
+		*/
 
 	} while (codigo_evento != FIM);
 

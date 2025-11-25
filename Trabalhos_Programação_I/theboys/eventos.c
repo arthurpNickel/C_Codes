@@ -1,3 +1,10 @@
+//posso ir criando novos campos? -> heroi vivo, missao cumprida, 
+//acesso de herois em missao
+//Verificar se tem que fazer casos de erro
+//Enquanto o herói está viajando ele carrega na sua struct o id da base antiga?
+//Prorrogar o evento missão -> mudar tempo ou criar novo evento?
+
+
 //TO DO:
 //Mudar todo o vetor de missões para estrutura dinâmica
 //Criar um estrutura para a ordenação de bases por distância!!
@@ -142,6 +149,13 @@ int heroi_morto(struct Mundo *m, int heroi)
 		return 0;
 	return 1;
 }
+
+/*double???
+double distancia(int x1, int y1, int x2, int y2) 
+{
+    return sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
+}
+*/
 
 /*Herói h chegando na base b no instante t. Ao chegar, o
 herói analisa o tamanho da fila e decide se espera para entrar ou desiste*/
@@ -333,77 +347,55 @@ void evento_morre(struct Mundo *m, struct morre *mo)
 /*Uma missão M é disparada no instante T*/
 void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiusculo????!!!!!!!!!!!!!!
 {
-	struct fprio_t *distancia_bases; //T: esqueci de liberar
 	struct cjto_t *habilidades_base;
 	struct morre *mo;
 	struct Base *primeira_base, *base; //T: verificar
-	int i, distancia, BMP, b, primeira_id, id_base, escolhido, xp_atual; //T: verificar
+	int i, j, distancia, BMP, b, primeira_id, id_base, escolhido, xp_atual; //T: verificar
+	int distancia_missao[NBASES]; /* Cria vetor ordenado pela distância */
 
 	M->tentativas++;
 
+
+	//FAZER ODRDENAÇÃO DO VETOR POR DISTÂNCIA AQUI!!!!!!!!!!!!!!!!!!!
+
+
+	/*
 	printf("%6d: MISSAO %d TENT %d HAB REQ: [ ", M->tempo, M->id, M->tentativas);
 	cjto_imprime(M->habilidades_m);
 	printf(" ]\n");
+	*/
+	
+	//T: avaliar retorno de tipo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//T: modular distância??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	distancia = sqrt(pow(m->bases[i].local.x - M->local.x, 2) + pow(m->bases[i].local.y - M->local.y, 2));
 
-	distancia_bases = fprio_cria();
-
-	if (distancia_bases == NULL) //Q: Precisa?????
-		return;
-
-	/* Calcula a distância de cada base ao local da missão e insere em uma fila, ordenada pela distancia */
-	for (i = 0; i < m->nbases; i++)
-	{
-		//T: avaliar retorno de tipo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		//T: modular distância??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		distancia = sqrt(pow(m->bases[i].local.x - M->local.x, 2) + pow(m->bases[i].local.y - M->local.y, 2));
-
-		printf("%6d: MISSAO %d BASE %d DIST %d HEROIS [ ", M->tempo, M->id, i, distancia);
-		cjto_imprime(m->bases[i].presentes);
-		printf(" ]\n");
-
-		if (cjto_card(m->bases[i].presentes) != 0)	//NÃO POSSO INSERIR ALGO ESTÁTICO -> DÁ RUIM NO DESTRÓI
-			fprio_insere(distancia_bases, &(m->bases[i]), i, distancia); //A MERDA ESTÁ TODA AQUI!!!!!!!!!!!!!
-	}
-
-	/* Se não existe nenhum herói em nenhuma base, é marcada como impossível*/
-	if (fprio_tamanho(distancia_bases) == 0)
-	{
-		fprio_destroi(distancia_bases);
-
-		/* Adia missão em 1 dia */
-		printf("%6d: MISSAO %d IMPOSSIVEL\n", M->tempo, M->id);
-		M->tempo = M->tempo + 1440;
-		fprio_insere(m->LEF, M, MISSAO, M->tempo);
-
-		return;
-	}
-
-	/* Guarda base mais próxima - Caso precise usar composto V*/
-	primeira_base = fprio_retira(distancia_bases, &id_base ,&distancia); //Q: isso é gambiarra??!!!!!!!!!!!!!!1
-	primeira_id = id_base;
-	fprio_insere(distancia_bases, &m->bases[id_base], id_base, distancia);
+	/*
+	printf("%6d: MISSAO %d BASE %d DIST %d HEROIS [ ", M->tempo, M->id, i, distancia);
+	cjto_imprime(m->bases[i].presentes);
+	printf(" ]\n");
+	*/
 
 	BMP = 0; /* "Base mais próxima com heróis capazes" <- Falso */
 
 	/* Verifica se existe alguma base com todas as habilidades necessárias para a missão */
-	while (!BMP && fprio_tamanho(distancia_bases) > 0)
+	i = 0;
+	while (!BMP && i < NBASES)
 	{
-		base = fprio_retira(distancia_bases, &id_base, &distancia);
-
 		/* Criação do conjunto de habilidades da base retirada*/
-		habilidades_base = cjto_cria(NHABILIDADES);		
-		for (i = 0; i < m->nherois; i++) //Q: Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
+		habilidades_base = cjto_cria();
+
+		for (j = 0; j < m->nherois; j++)
 		{
 			/* Se o herói pertecente a base, então suas habilidades são unidas as da base*/
-			if (cjto_pertence(m->bases[id_base].presentes, i))
+			if (cjto_pertence(m->bases[v[i]].presentes, j))
 			{
-				printf("%6d: MISSAO %d HAB HEROI %2d: [ ", M->tempo, M->id, i);
-				cjto_imprime(m->herois[i].habilidades);
+				printf("%6d: MISSAO %d HAB HEROI %2d: [ ", M->tempo, M->id, j);
+				cjto_imprime(m->herois[j].habilidades);
 				printf(" ]\n");
 
-				habilidades_base = cjto_uniao(habilidades_base, m->herois[i].habilidades);
+				habilidades_base = cjto_uniao(habilidades_base, m->herois[j].habilidades);
 
-				printf("%6d: MISSAO %d UNIAO HAB BASE %d: [ ", M->tempo, M->id, id_base);
+				printf("%6d: MISSAO %d UNIAO HAB BASE %d: [ ", M->tempo, M->id, v[i]);
 				cjto_imprime(habilidades_base);
 				printf(" ]\n");
 			}
@@ -414,9 +406,9 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiuscu
 			BMP = 1; /* Base é marcada como BMP (o id dela está na variável id) */
 		else
 			cjto_destroi(habilidades_base); //Q: ou colocar um break no if de cima???!!!!!!!!!!!!!!!!!!!!!!!
-	}
 
-	fprio_destroi(distancia_bases);
+		i++;
+	}
 
 	/* Se existe base cujos heróis conseguem cumprir a missão: */
 	//id dessa base está salvo
