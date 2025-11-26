@@ -31,6 +31,67 @@
 
 #include "eventos.h"
 
+/*
+#include "sorts.h"
+*/
+
+/*double???
+double distancia(int x1, int y1, int x2, int y2) 
+{
+    return sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
+}
+*/
+
+/* Função de troca */
+void troca(int *a, int *b)
+{
+    int aux = *a;
+    *a = *b;
+    *b = aux;
+}
+
+
+/* ================= QUICK SORT ================= */
+
+void Particao(int v[], int ini, int fim, int *pos_pivo)
+{
+    int i = ini + 1, j = fim; //ini + 1
+    int pospivo = ini;
+    int pivo = calcula_distancia(v[pospivo]); //distancia
+
+    //Coloca pivô no início
+    troca(&v[ini], &v[pospivo]);
+
+    while (i < j) 
+	{
+
+        while (i <= fim && v[i] <= pivo) //distancia
+            i++; 
+        
+
+        while (j > ini && v[j] > pivo) //distancia
+            j--; 
+        
+        if (i < j) 
+        troca(&v[i], &v[j]);
+    }
+
+    troca(&v[ini], &v[j]);
+    *pos_pivo = j;
+}
+
+void QuickSort(int v[], int ini, int fim) 
+{
+    int pos_pivo;
+
+    if (ini < fim) 
+	{
+        Particao(v, ini, fim, &pos_pivo);
+        QuickSort(v, ini, pos_pivo - 1);
+        QuickSort(v, pos_pivo + 1, fim);
+    }
+}
+
 /* Cria evento chega e insere na LEF */
 void cria_evento_chega(struct Mundo *m, int heroi, int base, int tempo)
 {
@@ -149,13 +210,6 @@ int heroi_morto(struct Mundo *m, int heroi)
 		return 0;
 	return 1;
 }
-
-/*double???
-double distancia(int x1, int y1, int x2, int y2) 
-{
-    return sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
-}
-*/
 
 /*Herói h chegando na base b no instante t. Ao chegar, o
 herói analisa o tamanho da fila e decide se espera para entrar ou desiste*/
@@ -355,10 +409,12 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiuscu
 
 	M->tentativas++;
 
+	/* Inicializa vetor de bases ordenado pela distância a missão */
+	for (i = 0; i < m->nbases; i++)
+		distancia_missao[i] = i;
 
-	//FAZER ODRDENAÇÃO DO VETOR POR DISTÂNCIA AQUI!!!!!!!!!!!!!!!!!!!
-
-
+	QuickSort(distancia_missao, 0, m->nbases-1) //mando o mundo?
+	
 	/*
 	printf("%6d: MISSAO %d TENT %d HAB REQ: [ ", M->tempo, M->id, M->tentativas);
 	cjto_imprime(M->habilidades_m);
@@ -367,7 +423,8 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiuscu
 	
 	//T: avaliar retorno de tipo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//T: modular distância??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	distancia = sqrt(pow(m->bases[i].local.x - M->local.x, 2) + pow(m->bases[i].local.y - M->local.y, 2));
+	
+	//distancia = sqrt(pow(m->bases[i].local.x - M->local.x, 2) + pow(m->bases[i].local.y - M->local.y, 2));
 
 	/*
 	printf("%6d: MISSAO %d BASE %d DIST %d HEROIS [ ", M->tempo, M->id, i, distancia);
