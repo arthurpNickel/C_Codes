@@ -43,54 +43,59 @@ double distancia(int x1, int y1, int x2, int y2)
 */
 
 /* Função de troca */
-void troca(int *a, int *b)
+static void troca(int *a, int *b)
 {
     int aux = *a;
     *a = *b;
     *b = aux;
 }
 
-
-/* ================= QUICK SORT ================= */
-
-void Particao(int v[], int ini, int fim, int *pos_pivo)
+/* Calcula distância */
+static int calcula_distancia(struct Mundo *m, struct Missao *M, int id_base)
 {
-    int i = ini + 1, j = fim; //ini + 1
-    int pospivo = ini;
-    int pivo = calcula_distancia(v[pospivo]); //distancia
+    int dx = m->bases[id_base].local.x - M->local.x;
+    int dy = m->bases[id_base].local.y - M->local.y;
+    return dx*dx + dy*dy; /* distância ao quadrado (evita sqrt) */
+}
 
-    //Coloca pivô no início
+/* Partição */
+void Particao(struct Mundo *m, struct Missao *M, int v[], int ini, int fim, int *pos_pivo)
+{
+    int i = ini + 1, j = fim;
+    int pospivo = ini;
+    int pivo = calcula_distancia(m, M, v[pospivo]);
+
     troca(&v[ini], &v[pospivo]);
 
-    while (i < j) 
-	{
+    while (i < j)
+    {
+        while (i <= fim && calcula_distancia(m, M, v[i]) <= pivo)
+            i++;
 
-        while (i <= fim && v[i] <= pivo) //distancia
-            i++; 
-        
+        while (j > ini && calcula_distancia(m, M, v[j]) > pivo)
+            j--;
 
-        while (j > ini && v[j] > pivo) //distancia
-            j--; 
-        
-        if (i < j) 
-        troca(&v[i], &v[j]);
+        if (i < j)
+            troca(&v[i], &v[j]);
     }
 
     troca(&v[ini], &v[j]);
     *pos_pivo = j;
 }
 
-void QuickSort(int v[], int ini, int fim) 
+//usar static???!!!!!!!!!!!!!!!!!!!!!
+/* QuickSort */
+void QuickSort(struct Mundo *m, struct Missao *M, int v[], int ini, int fim)
 {
     int pos_pivo;
 
-    if (ini < fim) 
-	{
-        Particao(v, ini, fim, &pos_pivo);
-        QuickSort(v, ini, pos_pivo - 1);
-        QuickSort(v, pos_pivo + 1, fim);
+    if (ini < fim)
+    {
+        Particao(m, M, v, ini, fim, &pos_pivo);
+        QuickSort(m, M, v, ini, pos_pivo - 1);
+        QuickSort(m, M, v, pos_pivo + 1, fim);
     }
-}
+}  
 
 /* Cria evento chega e insere na LEF */
 void cria_evento_chega(struct Mundo *m, int heroi, int base, int tempo)
@@ -403,48 +408,47 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiuscu
 {
 	struct cjto_t *habilidades_base;
 	struct morre *mo;
-	struct Base *primeira_base, *base; //T: verificar
 	int i, j, distancia, BMP, b, primeira_id, id_base, escolhido, xp_atual; //T: verificar
 	int distancia_missao[NBASES]; /* Cria vetor ordenado pela distância */
 
 	M->tentativas++;
 
+	printf("%6d: MISSAO %d TENT %d HAB REQ: [ ", M->tempo, M->id, M->tentativas);
+	cjto_imprime(M->habilidades_m);
+	printf(" ]\n");
+
 	/* Inicializa vetor de bases ordenado pela distância a missão */
 	for (i = 0; i < m->nbases; i++)
 		distancia_missao[i] = i;
 
-	QuickSort(distancia_missao, 0, m->nbases-1) //mando o mundo?
-	
-	/*
-	printf("%6d: MISSAO %d TENT %d HAB REQ: [ ", M->tempo, M->id, M->tentativas);
-	cjto_imprime(M->habilidades_m);
-	printf(" ]\n");
-	*/
+    /* Ordena as bases pelo critério de distância */
+    QuickSort(m, M, distancia_missao, 0, m->nbases - 1);	
 	
 	//T: avaliar retorno de tipo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//T: modular distância??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	
 	//distancia = sqrt(pow(m->bases[i].local.x - M->local.x, 2) + pow(m->bases[i].local.y - M->local.y, 2));
 
-	/*
-	printf("%6d: MISSAO %d BASE %d DIST %d HEROIS [ ", M->tempo, M->id, i, distancia);
-	cjto_imprime(m->bases[i].presentes);
-	printf(" ]\n");
-	*/
+	//DEBUG: verficar se ordenação está dando certo
+	for (i = 0; i < m->nbases; i++)
+	{
+		printf("%6d: MISSAO %d BASE %d DIST %d HEROIS [ ", M->tempo, M->id, i, calcula_distancia(m, M, distancia_missao[i]));
+		cjto_imprime(m->bases[i].presentes);
+		printf(" ]\n");
+	}
 
 	BMP = 0; /* "Base mais próxima com heróis capazes" <- Falso */
 
 	/* Verifica se existe alguma base com todas as habilidades necessárias para a missão */
-	i = 0;
-	while (!BMP && i < NBASES)
+	i = 0; /* Inicializa indice do vetor de bases ordenada por distância */
+	while (!BMP && i < m->nbases)
 	{
 		/* Criação do conjunto de habilidades da base retirada*/
 		habilidades_base = cjto_cria();
 
 		for (j = 0; j < m->nherois; j++)
 		{
-			/* Se o herói pertecente a base, então suas habilidades são unidas as da base*/
-			if (cjto_pertence(m->bases[v[i]].presentes, j))
+			/* Se o herói j pertecente a base da vez, então suas habilidades são unidas as da base*/
+			if (cjto_pertence(m->bases[distancia_base[i]].presentes, j))
 			{
 				printf("%6d: MISSAO %d HAB HEROI %2d: [ ", M->tempo, M->id, j);
 				cjto_imprime(m->herois[j].habilidades);
@@ -452,11 +456,13 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiuscu
 
 				habilidades_base = cjto_uniao(habilidades_base, m->herois[j].habilidades);
 
-				printf("%6d: MISSAO %d UNIAO HAB BASE %d: [ ", M->tempo, M->id, v[i]);
+				printf("%6d: MISSAO %d UNIAO HAB BASE %d: [ ", M->tempo, M->id, distancia_missao[i]);
 				cjto_imprime(habilidades_base);
 				printf(" ]\n");
 			}
 		}
+
+		//Q: guardar a primeira base aqui!!!!!!!!!!!!!!!!!!!!!!!!! 
 
 		/* Verifica se as habilidades da missão estão contidas no conjunto de habilidades da base*/
 		if (cjto_contem(habilidades_base, M->habilidades_m))
@@ -478,12 +484,10 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiuscu
 		printf(" ]\n");
 		cjto_destroi(habilidades_base);
 
-		for (i = 0; i < m->nherois; i++) //Q: Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
-		{
-			/* Se o herói pertecente a base, então sua experiência aumenta*/
+		for (i = 0; i < m->nherois; i++)
+			/* Se o herói pertecente a base e não está morto, então sua experiência aumenta*/
 			if (cjto_pertence(m->bases[id_base].presentes, i) && !heroi_morto(m, i))
 				m->herois[i].xp++;
-		}
 
 		return;
 	}
@@ -495,14 +499,15 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiuscu
 
 		//Q: marcar missão como cumprida?!!!!!!!!!!!!!!!!!!!
 
+		//Q: Tá bom essa criação do conjunto??!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 		/* Criação do conjunto de habilidades da base mais próxima mais as habilidades do herói com composto V*/
-		habilidades_base = cjto_cria(NHABILIDADES);		
+		habilidades_base = cjto_cria(NHABILIDADES);
 		for (i = 0; i < m->nherois; i++) //Q: Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
-		{
 			/* Se o herói pertecente a base, então suas habilidades são unidas as da base*/
 			if (cjto_pertence(m->bases[primeira_id].presentes, i))
 				habilidades_base = cjto_uniao(habilidades_base, m->herois[i].habilidades);
-		}
+		
 		habilidades_base = cjto_uniao(habilidades_base, M->habilidades_m); /* Adiciona ao conjunto de habilidades da base as habilidades da missão*/
 
 		printf("%6d: MISSAO %d CUMPRIDA BASE %d HABS: [ ", M->tempo, M->id, primeira_id);
@@ -512,6 +517,7 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiuscu
 
 		/* Procura herói mais experiente da base mais próxima */
 		//base mais próxima tem heróis presentes
+		//Q: isso tá com cara de gambiarra!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		xp_atual = -1;	/* Variável para buscar maior xp */
 		for (i = 0; i < m->nherois; i++) //Q: Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
 		{
