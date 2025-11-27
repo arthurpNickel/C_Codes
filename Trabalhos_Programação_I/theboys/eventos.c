@@ -221,8 +221,6 @@ herói analisa o tamanho da fila e decide se espera para entrar ou desiste*/
 void evento_chega(struct Mundo *m, struct chega *c)
 {
 	int espera;
-	struct espera *e;
-	struct desiste *d;
 
 	if (heroi_morto(m, c->heroi))
 		return;
@@ -253,8 +251,6 @@ void evento_chega(struct Mundo *m, struct chega *c)
 porteiro da base B deve ser avisado para verificar a fila: */
 void evento_espera(struct Mundo *m, struct espera *e)
 {
-	struct avisa *a;
-
 	if (heroi_morto(m, e->heroi))
 		return;
 
@@ -270,7 +266,6 @@ void evento_espera(struct Mundo *m, struct espera *e)
 para lá*/
 void evento_desiste(struct Mundo *m, struct espera *d)
 {
-	struct viaja *v;
 	int destino; //Q: precisa?!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	if (heroi_morto(m, d->heroi))
@@ -287,7 +282,6 @@ void evento_desiste(struct Mundo *m, struct espera *d)
 /* O porteiro da base B trata a fila de espera: */
 void evento_avisa(struct Mundo *m, struct avisa *a)
 {
-	struct entra *in;
 	int h;
 	
 	//T: arrumar aqui
@@ -315,7 +309,6 @@ void evento_avisa(struct Mundo *m, struct avisa *a)
 agenda sua saída da base*/
 void evento_entra(struct Mundo *m, struct entra *in)
 {
-	struct sai *s;
 	int TPB;
 
 	if (heroi_morto(m, in->heroi))
@@ -328,15 +321,13 @@ void evento_entra(struct Mundo *m, struct entra *in)
 
 	printf("%6d: ENTRA HEROI %2d BASE %d (%2d/%2d) SAI %d\n",
 		in->tempo, in->heroi, in->base, cjto_card(m->bases[in->base].presentes), //ver se errei isso em outro lugar!!!!!!!!!!!!!!!
-		m->bases[in->base].lotacao, s->tempo);
+		m->bases[in->base].lotacao, in->tempo + TPB); //T: verificar esse tempo!!!!
 }
 
 /*O herói H sai da base B. Ao sair, escolhe uma base de destino para viajar; o
 porteiro de B é avisado, pois uma vaga foi liberada*/
 void evento_sai(struct Mundo *m, struct sai *s)
 {
-	struct viaja *v;
-	struct avisa *a;
 	int destino, status;
 
 	if (heroi_morto(m, s->heroi))
@@ -360,7 +351,6 @@ void evento_sai(struct Mundo *m, struct sai *s)
 /*O herói H se desloca para uma base D (que pode ser a mesma onde já está)*/
 void evento_viaja(struct Mundo *m, struct viaja *v)
 {
-	struct chega *c;
 	int distancia, duracao;
 
 	if (heroi_morto(m, v->heroi))
@@ -371,21 +361,19 @@ void evento_viaja(struct Mundo *m, struct viaja *v)
 	distancia = (int) sqrt((double)(pow((m->bases[v->destino].local.x - m->bases[m->herois[v->heroi].base].local.x), 2)
 	 						+ pow((m->bases[v->destino].local.y - m->bases[m->herois[v->heroi].base].local.y), 2)));
 
-	duracao = distancia / m->herois[v->heroi].velocidade; //arredondar para cima?? -> viagens instantâneas
+	duracao = distancia / m->herois[v->heroi].velocidade; //Q: arredondar para cima?? -> viagens instantâneas
 
 	cria_evento_chega(m, v->heroi, v->destino, v->tempo + duracao);
 
 	printf("%6d: VIAJA HEROI %2d BASE %d BASE %d DIST %d VEL %d CHEGA %d\n",
 			v->tempo, v->heroi, m->herois[v->heroi].base, v->destino, 
-			distancia, m->herois[v->heroi].velocidade, c->tempo);
+			distancia, m->herois[v->heroi].velocidade, v->tempo + duracao); //T: verficar se é esse tempo mesmo
 }
 
 //Q: Decrementar número de heróis!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 /*O herói H morre no instante T.*/
 void evento_morre(struct Mundo *m, struct morre *mo)
 {
-	struct avisa *a;
-
 	if (heroi_morto(m, mo->heroi)) //será??!!!!!!!!!!!!!!!!!!!!!
 		return;
 
@@ -407,8 +395,7 @@ void evento_morre(struct Mundo *m, struct morre *mo)
 void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiusculo????!!!!!!!!!!!!!!
 {
 	struct cjto_t *habilidades_base;
-	struct morre *mo;
-	int i, j, distancia, BMP, b, primeira_id, id_base, escolhido, xp_atual; //T: verificar
+	int i, j, distancia, BMP, b, id_primeira, id_base, escolhido, xp_atual; //T: verificar
 	int distancia_missao[NBASES]; /* Cria vetor ordenado pela distância */
 
 	M->tentativas++;
@@ -443,12 +430,12 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiuscu
 	while (!BMP && i < m->nbases)
 	{
 		/* Criação do conjunto de habilidades da base retirada*/
-		habilidades_base = cjto_cria();
+		habilidades_base = cjto_cria(m->nbases);
 
 		for (j = 0; j < m->nherois; j++)
 		{
 			/* Se o herói j pertecente a base da vez, então suas habilidades são unidas as da base*/
-			if (cjto_pertence(m->bases[distancia_base[i]].presentes, j))
+			if (cjto_pertence(m->bases[distancia_missao[i]].presentes, j))
 			{
 				printf("%6d: MISSAO %d HAB HEROI %2d: [ ", M->tempo, M->id, j);
 				cjto_imprime(m->herois[j].habilidades);
@@ -501,16 +488,25 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiuscu
 
 		//Q: Tá bom essa criação do conjunto??!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+		/* Guarda a base não vazia mais próxima */
+		id_primeira = 0;
+		while (cjto_card(m->bases[distancia_missao[id_primeira]].presentes) == 0)
+			i++;
+
+		//Q: Tem 3 laços que percorre todos os heróis aqui -> precisa??!!!!!!!!!!!!!!!!!
+			//Dá para fazer em 1 só
+
 		/* Criação do conjunto de habilidades da base mais próxima mais as habilidades do herói com composto V*/
 		habilidades_base = cjto_cria(NHABILIDADES);
 		for (i = 0; i < m->nherois; i++) //Q: Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
 			/* Se o herói pertecente a base, então suas habilidades são unidas as da base*/
-			if (cjto_pertence(m->bases[primeira_id].presentes, i))
+			if (cjto_pertence(m->bases[id_primeira].presentes, i))
 				habilidades_base = cjto_uniao(habilidades_base, m->herois[i].habilidades);
 		
-		habilidades_base = cjto_uniao(habilidades_base, M->habilidades_m); /* Adiciona ao conjunto de habilidades da base as habilidades da missão*/
+		/* Adiciona ao conjunto de habilidades da base as habilidades da missão */
+		habilidades_base = cjto_uniao(habilidades_base, M->habilidades_m); //tem que fazer isso??!!!!!!!!!!!!!!!!
 
-		printf("%6d: MISSAO %d CUMPRIDA BASE %d HABS: [ ", M->tempo, M->id, primeira_id);
+		printf("%6d: MISSAO %d CUMPRIDA BASE %d HABS: [ ", M->tempo, M->id, id_primeira);
 		cjto_imprime(habilidades_base);
 		printf(" ]\n");
 		cjto_destroi(habilidades_base);
@@ -522,7 +518,7 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiuscu
 		for (i = 0; i < m->nherois; i++) //Q: Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
 		{
 			/* Se o herói pertecente a base e tem xp maior que o atual escolhido, então ele passa a ser o escolhido*/
-			if (cjto_pertence(m->bases[primeira_id].presentes, i) && m->herois[i].xp > xp_atual && !heroi_morto(m, i))
+			if (cjto_pertence(m->bases[primeira_id].presentes, i) && m->herois[i].xp > xp_atual)
 			{
 				xp_atual = m->herois[i].xp;
 				escolhido = i;
@@ -532,7 +528,7 @@ void evento_missao(struct Mundo *m, struct Missao *M) //Q: Manter esse m maiuscu
 		for (i = 0; i < m->nherois; i++) //Q: Ta bom acessar os herois da base desse jeito??!!!!!!!!!!!!!!!!!!
 		{
 			/* Se o herói pertecente a base, então sua experiência aumenta*/
-			if (cjto_pertence(m->bases[primeira_id].presentes, i) && !heroi_morto(m, i))
+			if (cjto_pertence(m->bases[primeira_id].presentes, i))
 				m->herois[i].xp++;
 		}
 
