@@ -1,13 +1,10 @@
 //TO DO:
-//Mudar todo o vetor de missões para estrutura dinâmica
-//Não fazer código de erro
 
 //QUESTION:
-//Precisa liberar todo evento depois do switch case? fprio já libera item!!!
+//Mudo todas as estruturas para dinâmica?
 //Avalio retorno de eventos com casos de erro?
 //O que vou modular e o que não?
 //Usar time NULL no programa final?
-//Usar cjto_aleat em inicializações?
 
 // programa principal do projeto "The Boys - 2024/2"
 // Autor: Arthur Paul Nickel, GRR 20252825
@@ -30,11 +27,11 @@ int main ()
 {
 	/* Iniciar entidades e atributos -> Q: modular? */
 	struct Mundo mundo;
-	int codigo_evento, tempo, hab; 
-	int b, t; /* Variáveis de suporte */
 	void *evento_atual;
+	int codigo_evento; 
+	int b, t; /* Variáveis de suporte */
 
-	srand(0); //Q:Usar time NULL depois?
+	srand(0);//Q:Usar time NULL depois?
 
 	mundo.relogio = 0;
 	mundo.tam_mundo.x = TAMMUNDO;
@@ -44,94 +41,66 @@ int main ()
 	mundo.nbases = NBASES;
 	mundo.nmissoes = NMISSOES;
 	mundo.ncompostos = NCOMPOSTOS;
+	mundo.ncumpridas = 0;
+	mundo.neventos = 0;
 	mundo.LEF = fprio_cria(); /* LEF é uma fila de prioridade, com prioridade = tempo */
 
 	if(!(mundo.missoes = malloc(sizeof(struct Missao) * mundo.nmissoes))) /*Missões tem estrutura dinâmica*/
 		return 1;
 
-	//Q: usar cjto_aleat???!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 	/* Inicialização dos heróis */
-	mundo.vivos = cjto_cria(mundo.nherois);
 	for (int i = 0; i < mundo.nherois; i++)
 	{
 		mundo.herois[i].id = i;
 		mundo.herois[i].xp = 0;
-		mundo.herois[i].paciencia = rand() % 101; //0 a 100
-		mundo.herois[i].velocidade = 50 + rand() % 4951; //50 a 5000
-
-		cjto_insere(mundo.vivos, i);
-
-		/* Heroi terá uma quantidade aleatória de habilidadades, também aleatórias */
-		mundo.herois[i].habilidades = cjto_cria(1 + rand() % 4); //1 a 3
-		for (int j = 0; j < mundo.herois[i].habilidades->cap; j++)
-		{
-			hab = 1 + rand() % mundo.nhabilidades; //1 a NHABILIDADES
-			cjto_insere(mundo.herois[i].habilidades, hab);
-		}
+		mundo.herois[i].vivo = 1;
+		mundo.herois[i].paciencia = aleatorio(0, 100);
+		mundo.herois[i].velocidade = aleatorio(50, 5000);
+		mundo.herois[i].habilidades = cjto_aleat(aleatorio(1, 3), mundo.nhabilidades); /* Heroi terá uma quantidade aleatória de habilidadades, também aleatórias */
 	}
 
 	/* Inicialização das bases */
 	for (int i = 0; i < mundo.nbases; i++)
 	{
 		mundo.bases[i].id = i;
-		mundo.bases[i].local.x = rand() % mundo.tam_mundo.x; //0 a TAMMUNDO-1
-		mundo.bases[i].local.y = rand() % mundo.tam_mundo.y; //0 a TAMMUNDO-1
-		mundo.bases[i].lotacao = 3 + rand() % 11; //3 a 10
+		mundo.bases[i].local.x = aleatorio(0, mundo.tam_mundo.x - 1);
+		mundo.bases[i].local.y = aleatorio(0, mundo.tam_mundo.y - 1);
+		mundo.bases[i].lotacao = aleatorio(3, 10);
+		mundo.bases[i].fila_max = 0;
+		mundo.bases[i].num_missoes = 0;
 
 		mundo.bases[i].presentes = cjto_cria(mundo.bases[i].lotacao);
-
 		mundo.bases[i].fila_espera = fila_cria();
 	}
 
 	/* Inicialização das missões */
 	for (int i = 0; i < mundo.nmissoes; i++)
-	{
-		mundo.missoes[i].id = i; //Vai ser ponto ou ->?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		mundo.missoes[i].tentativas = 0;
-		mundo.missoes[i].local.x = rand() % mundo.tam_mundo.x; //0 a TAMMUNDO-1
-		mundo.missoes[i].local.y = rand() % mundo.tam_mundo.y; //0 a TAMMUNDO-1
-
-		mundo.missoes[i].habilidades_m = cjto_cria(6 + rand() % 5);  //6 a 10
-		for (int j = 0; j < mundo.missoes[i].habilidades_m->cap; j++)
-		{
-			hab = 1 + rand() % mundo.nhabilidades; //1 a NHABILIDADES
-			cjto_insere(mundo.missoes[i].habilidades_m, hab);
-		}
-	}
+		inicializa_evento_missao(&mundo, i);
 	
 	/* Eventos Iniciais */
 
-	/* Cada herói chegará em alguma base dentro de 3 dias */
+	//Q: Tá boa essa abordagem mais direta???!!!!!!!!!!!!!!!!!!!!!!!!!!
+	/* Cada herói chegará em alguma base aleatória dentro de 3 dias */
 	for (int i = 0; i < mundo.nherois; i++)
-	{
-		b = rand() % mundo.nbases;
-		t = rand() % 4321; //0 a 4320
-		cria_evento_chega(&mundo, i, b, t);
-	}
+		cria_evento_chega(&mundo, i, aleatorio(0, mundo.nbases-1), aleatorio(0, 4320)); //colocar comentário do motivo desse número
 
+	//Q: Modular cria evento missão???!!!!!!!!!!!!!!!!!!!!!!!!!!
 	/* Distribuição das missões na LEF */
 	for (int i = 0; i < mundo.nmissoes; i++)
 	{
-		mundo.missoes[i].tempo = rand() % (FIMMUNDO + 1);
-		fprio_insere(mundo.LEF, &mundo.missoes[i], MISSAO, mundo.missoes[i].tempo);
+		mundo.missoes[i]->tempo = aleatorio(0, FIMMUNDO);
+		fprio_insere(mundo.LEF, mundo.missoes[i], MISSAO, mundo.missoes[i]->tempo);
 	}
 
-
 	/* Evento que finalizará a mundo */
-	struct fim *f;
-	if (!(f = malloc(sizeof(struct fim))))
-		return 1; //Q: return o que?!!!!!!!!!!!!!!!!!!!!!!!!!
-	f->tempo = FIMMUNDO;
-
-	fprio_insere(mundo.LEF, f, FIM, FIMMUNDO);
+	cria_evento_fim(&mundo);
 
 	/* Laço da simulação */
 	do {
 		/* Evento atual aponta para a struct do próximo evento */
-		evento_atual = fprio_retira(mundo.LEF, &codigo_evento, &tempo);
+		evento_atual = fprio_retira(mundo.LEF, &codigo_evento, &t);
 
-		mundo.relogio = tempo;
+		mundo.relogio = t;
 
 		switch (codigo_evento) /* Escolhe o próximo evento a ser realizado na simulação de acordo com o código*/
 		{
@@ -172,21 +141,14 @@ int main ()
 				break;
 
 			case FIM:
-				printf("fim do mundo\n");
+				evento_fim(&mundo, evento_atual);
 				break;
 
 			default:
 				break;
 		}
-
-		//Q: CPA NÃO PRECISE -> FPRIO DESTRÓI ITENS TAMBÉM
-		/*
-		if (codigo_evento != MISSAO) / Missão é a única estrutura estática (mundo.missoes[i]) /
-			free(evento_atual);
-		*/
-
+	
 	} while (codigo_evento != FIM);
-
 
 	/* Destruição do mundo */
 	
@@ -201,11 +163,11 @@ int main ()
 		mundo.bases[i].fila_espera = fila_destroi(mundo.bases[i].fila_espera);
 	}
 
-	cjto_destroi(mundo.vivos);
-
 	/* Destruição do conjunto de habilidade de todas as missões*/
 	for (int i = 0; i < mundo.nmissoes; i++)
-		cjto_destroi(mundo.missoes[i].habilidades_m);
+		cjto_destroi(mundo.missoes[i]->habilidades_m);
+
+	free(mundo.missoes);
 
 	/* Destruição da LEF */
 	mundo.LEF = fprio_destroi(mundo.LEF);

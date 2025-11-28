@@ -25,7 +25,7 @@
 //Tirar daqui depois tudo isso!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 // seus #defines vão aqui
-#define NHABILIDADES 5 //original: 10
+#define NHABILIDADES 7 //original: 10
 #define FIMMUNDO 52560 //original: 525600
 #define NHEROIS NHABILIDADES * 5
 #define NBASES NHEROIS / 5
@@ -42,6 +42,7 @@ struct Heroi
 	int velocidade;
 	int xp;
 	int base;
+	int vivo; /* 1 se herói está vivo, 0 se morto */
 } ;
 
 struct Coord 
@@ -62,6 +63,10 @@ struct Base
 	struct fila_t *fila_espera; //fila de heróis esperando para entrar na base -> é uma fila normal
 
 	struct Coord local;
+	
+	int fila_max; /* Guarda o tamanho da maior fila que simulação teve*/
+
+	int num_missoes; /* Guarda a quantidade de missões em que herois da base se envolveram */
 } ;
 
 
@@ -72,21 +77,20 @@ struct Missao
 	struct Coord local;
 	int tempo; //Não tenho certeza disso!!!!!!!!!!!!!!!!!!]
 	int tentativas; //posso??!!!!!!!!!!!!!!!!!!!!!
-
 } ;
 
 struct Mundo 
 {
 	int nherois;
 	struct Heroi herois[NHEROIS]; //Número constante assim mesmo?
-	//acho que tirar isso
-	struct cjto_t *vivos; //válido??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	int nbases;
 	struct Base bases[NBASES]; //revisar isso
 	int nmissoes;
-	struct Missao *missoes; //revisar isso
+	struct Missao **missoes; //revisar isso
 	int nhabilidades;
 	int ncompostos; //Compostos V!!!!!!!!!!
+	int neventos; /* Guarda quantidade de eventos tratados */
+	int ncumpridas; /* Guarda quantidade de missões cumpridas */
 	struct Coord tam_mundo;
 	int relogio;
 	struct fprio_t *LEF;
@@ -152,6 +156,39 @@ struct fim
     int tempo;
 } ;
 
+/* Retorna um número aleatório entre min e max, inclusive */
+int aleatorio(int min, int max);
+
+/* Cria evento missão e inicializa atributos */
+void inicializa_evento_missao(struct Mundo *m, int id);
+
+/* Cria evento fim e insere na LEF */
+void cria_evento_fim(struct Mundo *m); //Q: colocar tempo???!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+/* Cria evento chega e insere na LEF */
+void cria_evento_chega(struct Mundo *m, int heroi, int base, int tempo);
+
+/* Cria evento espera e insere na LEF */
+void cria_evento_espera(struct Mundo *m, int heroi, int base, int tempo);
+
+/* Cria evento desiste e insere na LEF */
+void cria_evento_desiste(struct Mundo *m, int heroi, int base, int tempo);
+
+/* Cria evento avisa e insere na LEF */
+void cria_evento_avisa(struct Mundo *m, int base, int tempo);
+
+/* Cria evento viaja e insere na LEF */
+void cria_evento_viaja(struct Mundo *m, int heroi, int destino, int tempo);
+
+/* Cria evento sai e insere na LEF */
+void cria_evento_sai(struct Mundo *m, int heroi, int base, int tempo);
+
+/* Cria evento entra e insere na LEF */
+void cria_evento_entra(struct Mundo *m, int heroi, int base, int tempo);
+
+/* Cria evento morre e insere na LEF */
+void cria_evento_morre(struct Mundo *m, int heroi, int base, int tempo);
+
 /*Herói h chegando na base b no instante t. Ao chegar, o
 herói analisa o tamanho da fila e decide se espera para entrar ou desiste*/
 void evento_chega(struct Mundo *m, struct chega *c);
@@ -184,6 +221,7 @@ void evento_morre(struct Mundo *m, struct morre *mo);
 /*Uma missão M é disparada no instante T*/
 void evento_missao(struct Mundo *m, struct Missao *M);
 
-//evento fim
+/* Encerra a simulação no instante T e apresenta as estatísticas */
+void evento_fim(struct Mundo *m, struct fim *f);
 
 #endif
