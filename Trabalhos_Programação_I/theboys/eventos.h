@@ -25,8 +25,8 @@
 //Tirar daqui depois tudo isso!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 // seus #defines vão aqui
-#define NHABILIDADES 7 //original: 10
-#define FIMMUNDO 52560 //original: 525600
+#define NHABILIDADES 10 //original: 10
+#define FIMMUNDO 525600 //original: 525600
 #define NHEROIS NHABILIDADES * 5
 #define NBASES NHEROIS / 5
 #define NMISSOES FIMMUNDO / 100
@@ -90,6 +90,8 @@ struct Mundo
 	int nhabilidades;
 	int ncompostos; //Compostos V!!!!!!!!!!
 	int neventos; /* Guarda quantidade de eventos tratados */
+
+	//T: Não precisa desse campo-> Só verificar quantas estão na LEF ainda!!!!!!!!!!!!!!!! 
 	int ncumpridas; /* Guarda quantidade de missões cumpridas */
 	struct Coord tam_mundo;
 	int relogio;

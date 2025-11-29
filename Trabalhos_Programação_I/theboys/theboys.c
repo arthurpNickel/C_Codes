@@ -29,7 +29,7 @@ int main ()
 	struct Mundo mundo;
 	void *evento_atual;
 	int codigo_evento; 
-	int b, t; /* Variáveis de suporte */
+	int i, b, t; /* Variáveis de suporte */
 
 	srand(0);//Q:Usar time NULL depois?
 
@@ -49,7 +49,7 @@ int main ()
 		return 1;
 
 	/* Inicialização dos heróis */
-	for (int i = 0; i < mundo.nherois; i++)
+	for (i = 0; i < mundo.nherois; i++)
 	{
 		mundo.herois[i].id = i;
 		mundo.herois[i].xp = 0;
@@ -59,8 +59,14 @@ int main ()
 		mundo.herois[i].habilidades = cjto_aleat(aleatorio(1, 3), mundo.nhabilidades); /* Heroi terá uma quantidade aleatória de habilidadades, também aleatórias */
 	}
 
+	/* logo depois de criar as habilidades dos heróis, adicione: */
+	for (i = 0; i < mundo.nherois; i++) {
+		printf("INIT: heroi %2d habilidades ptr = %p\n", i, (void*)mundo.herois[i].habilidades);
+	}
+
+
 	/* Inicialização das bases */
-	for (int i = 0; i < mundo.nbases; i++)
+	for (i = 0; i < mundo.nbases; i++)
 	{
 		mundo.bases[i].id = i;
 		mundo.bases[i].local.x = aleatorio(0, mundo.tam_mundo.x - 1);
@@ -74,19 +80,19 @@ int main ()
 	}
 
 	/* Inicialização das missões */
-	for (int i = 0; i < mundo.nmissoes; i++)
+	for (i = 0; i < mundo.nmissoes; i++)
 		inicializa_evento_missao(&mundo, i);
 	
 	/* Eventos Iniciais */
 
 	//Q: Tá boa essa abordagem mais direta???!!!!!!!!!!!!!!!!!!!!!!!!!!
 	/* Cada herói chegará em alguma base aleatória dentro de 3 dias */
-	for (int i = 0; i < mundo.nherois; i++)
+	for (i = 0; i < mundo.nherois; i++)
 		cria_evento_chega(&mundo, i, aleatorio(0, mundo.nbases-1), aleatorio(0, 4320)); //colocar comentário do motivo desse número
 
 	//Q: Modular cria evento missão???!!!!!!!!!!!!!!!!!!!!!!!!!!
 	/* Distribuição das missões na LEF */
-	for (int i = 0; i < mundo.nmissoes; i++)
+	for (i = 0; i < mundo.nmissoes; i++)
 	{
 		mundo.missoes[i]->tempo = aleatorio(0, FIMMUNDO);
 		fprio_insere(mundo.LEF, mundo.missoes[i], MISSAO, mundo.missoes[i]->tempo);
@@ -147,30 +153,44 @@ int main ()
 			default:
 				break;
 		}
+
+		if (codigo_evento != MISSAO) /* Evento missão será utilizado para estatísticas */
+			free(evento_atual);
 	
 	} while (codigo_evento != FIM);
 
 	/* Destruição do mundo */
 	
-	/* Destruição dos conjuntos de habilidades dos heróis */
-	for (int i = 0; i < mundo.nherois; i++)
-		cjto_destroi(mundo.herois[i].habilidades); //verificar se é assim mesmo!!!!!!
-
 	/* Destruição dos conjuntos de presentes e das filas de espera de todas as bases */
-	for (int i = 0; i < mundo.nbases; i++)
+	for (i = 0; i < mundo.nbases; i++)
 	{
-		cjto_destroi(mundo.bases[i].presentes);
+		mundo.bases[i].presentes = cjto_destroi(mundo.bases[i].presentes);
 		mundo.bases[i].fila_espera = fila_destroi(mundo.bases[i].fila_espera);
 	}
 
 	/* Destruição do conjunto de habilidade de todas as missões*/
-	for (int i = 0; i < mundo.nmissoes; i++)
+	for (i = 0; i < mundo.nmissoes; i++)
+	{
 		cjto_destroi(mundo.missoes[i]->habilidades_m);
 
-	free(mundo.missoes);
+		//Q: < ou <=???!!!!!!!!!!!!!!!!!!!!!!!!
+		if (mundo.missoes[i]->tempo < FIMMUNDO) /* Se evento foi cumprido, ele não está na LEF */
+			free(mundo.missoes[i]);
+	}
+/*
+	printf(">>> antes do cleanup final\n");
+	for (i = 0; i < mundo.nherois; i++) {
+		printf("CLEANUP: heroi %2d habilidades ptr = %p\n", i, (void*)mundo.herois[i].habilidades);
+	}
+*/
+	/* Destruição dos conjuntos de habilidades dos heróis */
+	for (i = 0; i < NHEROIS; i++)
+		mundo.herois[i].habilidades = cjto_destroi(mundo.herois[i].habilidades); //verificar se é assim mesmo!!!!!!
 
 	/* Destruição da LEF */
 	mundo.LEF = fprio_destroi(mundo.LEF);
+
+	free(mundo.missoes);
 
   return (0) ;
 }
