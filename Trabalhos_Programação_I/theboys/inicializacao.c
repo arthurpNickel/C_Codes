@@ -44,7 +44,7 @@ void inicializa_bases(Tp_Mundo *m)
 		m->bases[i].fila_max = 0;
 		m->bases[i].num_missoes = 0;
 
-		m->bases[i].presentes = cjto_cria(m->bases[i].lotacao);
+		m->bases[i].presentes = cjto_cria(m->nbases);
 		m->bases[i].fila_espera = fila_cria();
 	}
 }
