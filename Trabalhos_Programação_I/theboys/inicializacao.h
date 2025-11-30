@@ -1,3 +1,5 @@
+/* Definição das funções de inicialização da simulação */
+
 #ifndef INICIALIZACAO_H
 #define INICIALIZACAO_H
 
@@ -12,16 +14,20 @@
 #include "fila.h"
 #include "auxiliares.h"
 
-/* Inicializações */
+/*Inicializa o mundo, seus campos e atributos
+ **/
 void inicializa_mundo(Tp_Mundo *m);
 
-
+/*Inicializa os heróis e seus atributos
+ **/
 void inicializa_herois(Tp_Mundo *m);
 
-
+/*Inicializa as bases e seus campos
+ **/
 void inicializa_bases(Tp_Mundo *m);
 
-
+/*Inicializa as missões e seus campos
+ **/
 void inicializa_missoes(Tp_Mundo *m);
 
 #endif

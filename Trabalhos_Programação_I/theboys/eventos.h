@@ -1,3 +1,5 @@
+/* Definição dos eventos da simulação */
+
 #ifndef EVENTOS_H
 #define EVENTOS_H
 
@@ -20,7 +22,7 @@
 void evento_chega(Tp_Mundo *m, Tp_Chega *c);
 
 /*O herói entra na fila de espera de uma base. Assim que entra na fila,
- *o porteiro da base deve ser avisado para verificar a fila.
+ *o porteiro da base deve ser avisado para verificar a lotação da base.
  **/
 void evento_espera(Tp_Mundo *m, Tp_Espera *e);
 
@@ -47,7 +49,7 @@ void evento_sai(Tp_Mundo *m, Tp_Sai *s);
  **/
 void evento_viaja(Tp_Mundo *m, Tp_Viaja *v);
 
-/*O herói morre wm um certo instante.
+/*O herói morre em alguma missão, usando composto V.
  **/
 void evento_morre(Tp_Mundo *m, Tp_Morre *mr);
 

@@ -1,6 +1,9 @@
+/* Definição das estruturas dos eventos na simulação */
+
 #ifndef ESTRUTURAS_EVENTOS_H
 #define ESTRUTURAS_EVENTOS_H
 
+/* Definição dos códigos de cada evento */
 #define CHEGA 1
 #define ESPERA 2
 #define DESISTE 3
@@ -12,6 +15,7 @@
 #define MISSAO 9
 #define FIM 10
 
+/* Estruturas de cada evento */
 struct chega
 {
     int tempo;
@@ -65,6 +69,7 @@ struct morre
 	int heroi;
 	int tempo;
 	int base;
+    int missao;
 } ;
 
 struct fim
@@ -72,6 +77,7 @@ struct fim
     int tempo;
 } ;
 
+/* Nomenclatura das estruturas dos eventos */
 typedef struct chega Tp_Chega;
 typedef struct espera Tp_Espera;
 typedef struct desiste Tp_Desiste;

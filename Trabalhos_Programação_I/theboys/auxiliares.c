@@ -1,12 +1,15 @@
+/* Implementação das funções auxiliares da simulação */
+
+
 #include "auxiliares.h"
 
-/* retorna um número aleatório entre min e max, inclusive */
+
 int aleatorio(int min, int max)
 {
 	return min + rand() % (max - min + 1);
 }
 
-/* Retorna união das habilidades entre u (onde será unido) e h */
+
 struct cjto_t *uniao_habilidades(struct cjto_t *u, struct cjto_t *h)
 {
     struct cjto_t *aux = cjto_uniao(u, h);
@@ -15,7 +18,6 @@ struct cjto_t *uniao_habilidades(struct cjto_t *u, struct cjto_t *h)
 }
 
 
-/* Função de troca */
 void troca(int *a, int *b)
 {
     int aux = *a;
@@ -23,13 +25,14 @@ void troca(int *a, int *b)
     *b = aux;
 }
 
-/* Calcula distância entre 2 pontos */
+/*Calcula a distância cartesiana entre 2 pontos
+ **/
 int calcula_distancia(int x1, int y1, int x2, int y2) 
 {
     return (int)round(sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2)));
 }
 
-/* Calcula distância entre duas bases*/
+
 int calcula_distancia_bases(Tp_Mundo *m, int b1, int b2)
 {
 	return calcula_distancia(
@@ -38,7 +41,7 @@ int calcula_distancia_bases(Tp_Mundo *m, int b1, int b2)
 	);
 }
 
-/* Calcula distância da missão até a base*/
+
 int calcula_distancia_missao(Tp_Mundo *m, Tp_Missao *M, int id_base)
 {
 	return calcula_distancia(
@@ -47,41 +50,35 @@ int calcula_distancia_missao(Tp_Mundo *m, Tp_Missao *M, int id_base)
 	);
 }
 
-/* Partição */
-void Particao(Tp_Mundo *m, Tp_Missao *M, int v[], int ini, int fim, int *pos_pivo)
+/*Partição do vetor pelo método Lomuto
+ **/
+void particao(Tp_Mundo *m, Tp_Missao *M, int v[], int ini, int fim, int *pos_pivo)
 {
-    int i = ini + 1, j = fim;
-    int pospivo = ini;
-    int pivo = calcula_distancia_missao(m, M, v[pospivo]);
+    int pivo = calcula_distancia_missao(m, M, v[fim]);
+    int i = ini - 1;
 
-    troca(&v[ini], &v[pospivo]);
-
-    while (i < j)
+    for (int j = ini; j < fim; j++)
     {
-        while (i <= fim && calcula_distancia_missao(m, M, v[i]) <= pivo)
+        if (calcula_distancia_missao(m, M, v[j]) <= pivo)
+        {
             i++;
-
-        while (j > ini && calcula_distancia_missao(m, M, v[j]) > pivo)
-            j--;
-
-        if (i < j)
             troca(&v[i], &v[j]);
+        }
     }
 
-    troca(&v[ini], &v[j]);
-    *pos_pivo = j;
+    troca(&v[i + 1], &v[fim]);
+    *pos_pivo = i + 1;
 }
 
-//usar static???!!!!!!!!!!!!!!!!!!!!!
-/* QuickSort */
-void QuickSort(Tp_Mundo *m, Tp_Missao *M, int v[], int ini, int fim)
+
+void quick_sort(Tp_Mundo *m, Tp_Missao *M, int v[], int ini, int fim)
 {
     int pos_pivo;
 
     if (ini < fim)
     {
-        Particao(m, M, v, ini, fim, &pos_pivo);
-        QuickSort(m, M, v, ini, pos_pivo - 1);
-        QuickSort(m, M, v, pos_pivo + 1, fim);
+        particao(m, M, v, ini, fim, &pos_pivo);
+        quick_sort(m, M, v, ini, pos_pivo - 1);
+        quick_sort(m, M, v, pos_pivo + 1, fim);
     }
 }  

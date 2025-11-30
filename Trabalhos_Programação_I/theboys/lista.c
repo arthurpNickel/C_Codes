@@ -91,7 +91,8 @@ int lista_insere_fim (struct lista *lista, int chave)
 	}
 	
 	/*laço para aux apontar para o último nodo*/
-	while (aux->prox != NULL) aux = aux->prox;
+	while (aux->prox != NULL)
+		aux = aux->prox;
 	
 	aux->prox = novo;
 	
@@ -111,16 +112,8 @@ int lista_insere_ordenado (struct lista *lista, int chave)
 	
 	lista->tamanho++;
 	
-	/*se a lista for vazia, insere no início*/
-	if (aux == NULL)
-	{
-		lista->ini = novo;
-		novo->prox = NULL;
-		return 1;
-	}
-	
-	/*se primeiro nodo já tem chave maior que o novo, insere no primeiro*/
-	if (aux->chave >= chave)
+	/*verifica casos em que insere no início*/
+	if (aux == NULL || aux->chave >= chave)
 	{
 		novo->prox = aux;
 		lista->ini = novo;
@@ -128,7 +121,8 @@ int lista_insere_ordenado (struct lista *lista, int chave)
 	}
 	
 	/*laço para aux apontar para nodo anterior ao nodo novo ou para o último nodo*/
-	while (aux->prox != NULL && aux->prox->chave < chave) aux = aux->prox;
+	while (aux->prox != NULL && aux->prox->chave < chave)
+		aux = aux->prox;
 	
 	/*se o nodo novo é o maior da lista, insere no último*/
 	if (aux->prox == NULL)
@@ -185,7 +179,8 @@ int lista_remove_fim (struct lista *lista, int *chave)
 	}
 	
 	/*laço para aux apontar para o penúltimo nodo*/
-	while (aux->prox->prox != NULL) aux = aux->prox;
+	while (aux->prox->prox != NULL)
+		aux = aux->prox;
 	
 	*chave = aux->prox->chave;
 	
@@ -216,7 +211,8 @@ int lista_remove_ordenado (struct lista *lista, int chave)
 	}
 	
 	/*laço que faz aux apontar para o nodo anterior do que o que se deve remover*/
-	while (aux->prox->chave != chave) aux = aux->prox;
+	while (aux->prox->chave != chave)
+		aux = aux->prox;
 	
 	removido = aux->prox; /*guarda o endereço do nodo que se quer remover*/
 	
@@ -245,7 +241,8 @@ int lista_pertence (struct lista *lista, int chave)
 	struct nodo *aux = lista->ini;
 	
 	/*laço que procura chave na lista*/
-	while (aux != NULL && aux->chave != chave) aux = aux->prox;
+	while (aux != NULL && aux->chave != chave)
+		aux = aux->prox;
 	
 	/*se procurou por toda lista e não achou, retorna 0*/
 	if (aux == NULL)

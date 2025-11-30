@@ -1,4 +1,8 @@
+/* Implementação das funções de inicialização da simulação */
+
+
 #include "inicializacao.h"
+
 
 void inicializa_mundo(Tp_Mundo *m)
 {
@@ -10,7 +14,6 @@ void inicializa_mundo(Tp_Mundo *m)
 	m->nbases = NBASES;
 	m->nmissoes = NMISSOES;
 	m->ncompostos = NCOMPOSTOS;
-	m->ncumpridas = 0;
 	m->neventos = 0;
 	m->LEF = fprio_cria(); /* LEF é uma fila de prioridade, com prioridade = tempo */
 }
@@ -44,8 +47,8 @@ void inicializa_bases(Tp_Mundo *m)
 		m->bases[i].fila_max = 0;
 		m->bases[i].num_missoes = 0;
 
-		m->bases[i].presentes = cjto_cria(m->nbases);
-		m->bases[i].fila_espera = fila_cria();
+		m->bases[i].presentes = cjto_cria(m->nherois); /* Conjunto de heróis presentes na base */
+		m->bases[i].fila_espera = fila_cria(); /* Fila de espera da base */
 	}
 }
 
@@ -57,11 +60,15 @@ void inicializa_missoes(Tp_Mundo *m)
 
 	for (i = 0; i < m->nmissoes; i++)
 	{
-        m->missoes[i] = malloc(sizeof(Tp_Missao));
+        m->missoes[i] = malloc(sizeof(Tp_Missao)); /* Missão alocada dinamicamente */
         m->missoes[i]->id = i;
         m->missoes[i]->tentativas = 0;
+
+		/* Localização aleatória da missão no mundo */
         m->missoes[i]->local.x = aleatorio(0, m->tam_mundo.x - 1);
         m->missoes[i]->local.y = aleatorio(0, m->tam_mundo.y - 1);
+		
+		/* Criação do conjunto de habilidades requeridas para missão */
         m->missoes[i]->habilidades_m = cjto_aleat(aleatorio(6, 10), m->nhabilidades);
 	}
 }

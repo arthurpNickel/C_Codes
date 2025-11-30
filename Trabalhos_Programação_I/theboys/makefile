@@ -2,7 +2,7 @@
 # Carlos Maziero - DINF/UFPR, 2024/2
 
 CC      = gcc
-CFLAGS  = -Wall -Wextra -g -std=c99 #Apaguei o -Werror
+CFLAGS  = -Wall -Werror -Wextra -g -std=c99
 LDLIBS  = -lm
 MAIN    = theboys
 ENTREGA = $(MAIN)

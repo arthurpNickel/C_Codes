@@ -1,17 +1,9 @@
-//Revisão
-//Ver se não tem código de erro
-
-//TO DO:
-
-//QUESTION:
-//Usar time NULL no programa final?
-
 // programa principal do projeto "The Boys - 2024/2"
 // Autor: Arthur Paul Nickel, GRR 20252825
 
-// seus #includes vão aqui
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "valores_simulacao.h"
 #include "entidades.h"
@@ -19,44 +11,45 @@
 #include "criacao.h"
 #include "eventos.h"
 #include "destruicao.h"
-
 #include "fprio.h"
 
-#include "fila.h"
-#include "lista.h"
-#include "conjunto.h"
-#include "eventos.h"
-#include "entidades.h"
+/* Chama funções que inicializam simulação */
+void inicialiaza_simulacao(Tp_Mundo *mundo)
+{
+	inicializa_mundo(mundo);
+	inicializa_herois(mundo);
+	inicializa_bases(mundo);
+	inicializa_missoes(mundo);
+}
+
+/* Chama funções que destroem a simulação*/
+void destroi_simulacao(Tp_Mundo *mundo)
+{
+	destroi_bases(mundo);
+	destroi_missoes(mundo); //Q: Será que vai dar boa o free(m->missoes)???!!!!!!!
+	destroi_herois(mundo);
+	destroi_lef(mundo);
+}
 
 int main ()
 {
 	Tp_Mundo mundo;
-	void *evento_atual;
-	int codigo_evento; 
-	int i, b, t; /* Variáveis de suporte */
 
-	srand(0);//Q:Usar time NULL depois?
+	void *evento_atual; /* Variável que aponta para a estrutura do evento atual */
+	int codigo_evento; /* Guarda o código do evento atual */
 
-	/*----------Inicializações----------*/
-	inicializa_mundo(&mundo);
+	srand(time(NULL)); /* Semente para números aleatórios */
 
-	inicializa_herois(&mundo);
-
-	inicializa_bases(&mundo);
-
-	inicializa_missoes(&mundo);
-	/*----------------------------------*/
+	inicialiaza_simulacao(&mundo);
 	
-	cria_eventos_iniciais(&mundo);
+	cria_eventos_iniciais(&mundo); 
 
-	/* Laço da simulação */
+	/* Laço principal da simulação */
 	do {
-		/* Evento atual aponta para a struct do próximo evento */
-		evento_atual = fprio_retira(mundo.LEF, &codigo_evento, &t);
+		/* Evento atual aponta para a struct do próximo evento da LEF */
+		evento_atual = fprio_retira(mundo.LEF, &codigo_evento, &mundo.relogio);
 
-		mundo.relogio = t;
-
-		switch (codigo_evento) /* Escolhe o próximo evento a ser realizado na simulação de acordo com o código*/
+		switch (codigo_evento) /* Escolhe o próximo evento a ser realizado na simulação de acordo com o código */
 		{
 			case CHEGA:
 				evento_chega(&mundo, evento_atual);
@@ -102,27 +95,14 @@ int main ()
 				break;
 		}
 
-		if (codigo_evento != MISSAO) /* Evento missão será utilizado para estatísticas */
+		/* Evento missão será utilizado para estatísticas,
+		   por isso, não deve ser destruído por enquanto */
+		if (codigo_evento != MISSAO)
 			free(evento_atual);
 	
 	} while (codigo_evento != FIM);
 
-/*Q: 
-	printf(">>> antes do cleanup final\n");
-	for (i = 0; i < mundo.nherois; i++) {
-		printf("CLEANUP: heroi %2d habilidades ptr = %p\n", i, (void*)mundo.herois[i].habilidades);
-	}
-*/
+	destroi_simulacao(&mundo);
 
-	/*--------Destruição do mundo--------*/
-	destroi_bases(&mundo);
-
-	destroi_missoes(&mundo); //Q: Será que vai dar boa o free(m->missoes)???!!!!!!!
-
-	destroi_herois(&mundo);
-	
-	destroi_lef(&mundo);
-	/*-----------------------------------*/
-
-  return (0) ;
+	return (0);
 }

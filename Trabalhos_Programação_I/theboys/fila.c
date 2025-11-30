@@ -2,10 +2,7 @@
 #include <stdlib.h>
 #include "fila.h"
 
-//Testar!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-// Cria uma fila vazia.
-// Retorno: ponteiro para a fila criada ou NULL se erro.
 struct fila_t *fila_cria ()
 {
 	struct fila_t *f;
@@ -19,11 +16,15 @@ struct fila_t *fila_cria ()
 	return f;
 }
 
-// Libera todas as estruturas de dados da fila, inclusive os itens.
-// Retorno: NULL.
+
 struct fila_t *fila_destroi (struct fila_t *f)
 {
-	struct fila_nodo_t *aux = f->prim;
+	struct fila_nodo_t *aux;
+
+    if (f == NULL)
+        return NULL;
+
+    aux = f->prim;
 	
 	/*Enquanto aux não estiver aterrado*/
 	while (aux != NULL)
@@ -40,8 +41,7 @@ struct fila_t *fila_destroi (struct fila_t *f)
 	return NULL;
 }
 
-// Insere um item no final da fila (politica FIFO).
-// Retorno: 1 se tiver sucesso ou 0 se falhar.
+
 int fila_insere (struct fila_t *f, int item)
 {
 	struct fila_nodo_t *novo;
@@ -70,8 +70,7 @@ int fila_insere (struct fila_t *f, int item)
 	return 1;
 }
 
-// Retira o primeiro item da fila e o devolve
-// Retorno 1 se a operação foi bem sucedida e 0 caso contrário
+
 int fila_retira (struct fila_t *f, int *item)
 {
     struct fila_nodo_t *aux;
@@ -94,8 +93,7 @@ int fila_retira (struct fila_t *f, int *item)
     return 1;
 }
 
-// Informa o número de itens na fila.
-// Retorno: N >= 0 ou -1 se erro.
+
 int fila_tamanho (struct fila_t *f)
 {
     if (f == NULL)
@@ -104,8 +102,7 @@ int fila_tamanho (struct fila_t *f)
     return f->num;
 }
 
-// Existe liberdade para as mensagens?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Imprime o conteúdo da fila 
+
 void fila_imprime (struct fila_t *f)
 {
     struct fila_nodo_t *aux;
@@ -115,14 +112,14 @@ void fila_imprime (struct fila_t *f)
 
     aux = f->prim;
 
-    if (f->num != 1) //Será que ficou confuso?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (f->num != 1) /* Se fila não for unitária...*/
     {
-        while (aux->prox->prox != NULL)
+        while (aux->prox->prox != NULL) /* Imprime até o penúltimo com espaço */
         {
             printf("%d ", aux->item);
             aux = aux->prox;
         }
-        aux = aux->prox;
+        aux = aux->prox; /* aux aponta para o último nodo */
     }
-    printf("%d", aux->item);   
+    printf("%d", aux->item); /* Imprime último item sem espaço */
 }
