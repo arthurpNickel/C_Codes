@@ -26,7 +26,7 @@ void inicialiaza_simulacao(Tp_Mundo *mundo)
 void destroi_simulacao(Tp_Mundo *mundo)
 {
 	destroi_bases(mundo);
-	destroi_missoes(mundo); //Q: Será que vai dar boa o free(m->missoes)???!!!!!!!
+	destroi_missoes(mundo);
 	destroi_herois(mundo);
 	destroi_lef(mundo);
 }
