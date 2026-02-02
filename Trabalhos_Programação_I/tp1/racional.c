@@ -11,8 +11,6 @@
 /* coloque aqui seus includes (primeiro os <...>, depois os "...") */
 #include <stdio.h>
 #include <stdlib.h>
-
-/*------------------------*/
 #ifndef RACIONAL
 #define RACIONAL
 
@@ -21,7 +19,6 @@ struct racional {
   long num;          /* numerador   */
   long den;          /* denominador */
 };
-/*------------------------*/
 
 /*
  * Implemente aqui as funcoes definidas no racionais.h; caso precise,
@@ -56,6 +53,15 @@ long mmc (long a, long b)
 	return (a * b / mdc(a, b));
 }
 
+/* Retorna 1 se o racional r for válido ou 0 se for inválido.
+ * Um racional é inválido se seu denominador for zero */
+int valido_r (struct racional r)
+{
+	if (r.den == 0)
+		return 0;
+	return 1;
+}
+
 /* Recebe um número racional e o simplifica.
  * Por exemplo, ao receber 10/8 deve retornar 5/4.
  * Se ambos numerador e denominador forem negativos, deve retornar um positivo.
@@ -69,7 +75,7 @@ struct racional simplifica_r (struct racional r)
 		vmdc = mdc(r.num, r.den);
 		r.num = r.num/vmdc;
 		r.den = r.den/vmdc;
-		if (((r.num < 0) && (r.den < 0)) || ((r.num > 0) && (r.den < 0))) //colocar negativo no numerador ou tirar do número
+		if (((r.num < 0) && (r.den < 0)) || ((r.num > 0) && (r.den < 0)))
 		{
 			r.num = -r.num;
 			r.den = -r.den;
@@ -78,21 +84,13 @@ struct racional simplifica_r (struct racional r)
 	return r;
 }
 
+/* Cria um número racional com o numerador e denominador indicados. */
 struct racional cria_r (long numerador, long denominador)
 {
         struct racional r;
         r.num = numerador;
         r.den = denominador;
 	return r;
-}
-
-/* Retorna 1 se o racional r for válido ou 0 se for inválido.
- * Um racional é inválido se seu denominador for zero */
-int valido_r (struct racional r)
-{
-	if (r.den = 0)
-		return 0;
-	return 1;
 }
 
 /* Retorna um número racional aleatório na forma simplificada.
@@ -119,23 +117,23 @@ struct racional sorteia_r (long min, long max)
      - se numerador e denominador forem negativos, o racional é positivo. */
 void imprime_r (struct racional r)
 {
-	simplifica_r(r);
+	r = simplifica_r(r);
         if (!valido_r(r))
         {
-              printf("%c", "INVALIDO");
+              printf("INVALIDO");
               return;
         }
-        if (r.num = 0)
+        if (r.num == 0)
         {
               printf("%d", 0);
               return;
         }
-        if (r.den = 1)
+        if (r.den == 1)
         {
-              printf("%d", r.num);
+              printf("%ld", r.num);
 	      return;
         }
-        printf("%d %c %d", r.num, "/", r.den);
+        printf("%ld/%ld", r.num, r.den);
         return;
 }
 
@@ -153,7 +151,6 @@ struct racional soma_r (struct racional r1, struct racional r2)
  * se r1 ou r2 for inválido, o resultado deve ser inválido */
 struct racional subtrai_r (struct racional r1, struct racional r2)
 {
-	//declarar variável
 	r2.num = -r2.num;
 	return soma_r(r1, r2);
 }
@@ -176,7 +173,7 @@ struct racional divide_r (struct racional r1, struct racional r2)
 	struct racional quociente;
 	int aux = r2.num;  /*inverte segundo racional*/
 	r2.num = r2.den;
-	r2.den = r2.num;
+	r2.den = aux;
 	quociente = multiplica_r(r1, r2);
 	return quociente;
 }
